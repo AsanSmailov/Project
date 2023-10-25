@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"log"
+	"net/http"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -44,6 +47,45 @@ func main() {
 			msg.Text = "..."
 		case "Расписание на завтра":
 			msg.Text = "..."
+		case "check":
+			var a, b string
+			msg.Text = "Введите число"
+			bot.Send(msg)
+			for update := range updates {
+				if update.Message == nil { // ignore any non-Message Updates
+					continue
+				}
+
+				log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+				msg.ReplyToMessageID = update.Message.MessageID
+				a = update.Message.Text
+				break
+			}
+			bot.Send(msg)
+			for update := range updates {
+				if update.Message == nil { // ignore any non-Message Updates
+					continue
+				}
+
+				log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+				msg.ReplyToMessageID = update.Message.MessageID
+				b = update.Message.Text
+				break
+			}
+			msg.Text = ""
+			client := http.Client{}
+			// Формируем строку запроса вместе с query string
+			requestURL := fmt.Sprintf("http://localhost:8080/sum?a=%s&b=%s", a, b)
+			// Выполняем запрос на сервер. Ответ попадёт в переменную response
+			request, _ := http.NewRequest("GET", requestURL, nil)
+			response, _ := client.Do(request)
+			resBody, _ := io.ReadAll(response.Body) // Получаем тело ответа
+			defer response.Body.Close()
+			log.Printf("%s", resBody)
 		default:
 			msg.Text = "Я не понимаю, что вы хотите сказать."
 		}
