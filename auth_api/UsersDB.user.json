@@ -1,0 +1,26 @@
+[{
+  "_id": {
+    "$oid": "65376efbd48a81a8d8faad72"
+  },
+  "github_id": "123",
+  "tg_id": "@123",
+  "role": "Admin",
+  "about": {
+    "first_name": "Иван",
+    "last_name": "Иванов",
+    "group": "ПИ-232"
+  }
+},
+{
+  "_id": {
+    "$oid": "653e0f424d3c630b2eb7e1db"
+  },
+  "github_id": 144770548,
+  "tg_id": 0,
+  "role": "student",
+  "about": {
+    "first_name": "",
+    "last_name": "",
+    "group": ""
+  }
+}]
