@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"log"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,20 +23,17 @@ type User struct {
 	About    About  `bson:"about"`
 }
 
-func checkData(id int64, idType string) bool {
+func checkData(githubID int64, tgID string) bool {
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
 	err = client.Connect(context.TODO())
 	err = client.Ping(context.TODO(), nil)
 
 	collection := client.Database("UsersDB").Collection("user")
-	var field string
-
-	if idType == "github" {
-		field = "github_id"
-	} else {
-		field = "tg_id"
+	id, err1 := strconv.ParseInt(tgID, 10, 64)
+	if err1 != nil {
+		log.Fatal(err1)
 	}
-	filter := bson.D{{field, id}}
+	filter := bson.D{{"github_id", githubID}, {"tg_ id", id}}
 
 	var result User
 
@@ -48,7 +46,7 @@ func checkData(id int64, idType string) bool {
 	}
 }
 
-func register(userId int64, idType string) {
+func register(githubId int64, tgID string) {
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
 	err = client.Connect(context.TODO())
 	err = client.Ping(context.TODO(), nil)
@@ -56,11 +54,12 @@ func register(userId int64, idType string) {
 	collection := client.Database("UsersDB").Collection("user")
 
 	var user User
-	if idType == "github" {
-		user.GithubID = userId
-	} else {
-		user.TgId = userId
+	id, err1 := strconv.ParseInt(tgID, 10, 64)
+	if err1 != nil {
+		log.Fatal(err1)
 	}
+	user.GithubID = githubId
+	user.TgId = id
 	user.Role = "student"
 	user.About.FirstName = ""
 	user.About.LastName = ""
