@@ -44,7 +44,7 @@ func main() {
 		msg.ReplyToMessageID = update.Message.MessageID
 
 		if !check(chatids, update.Message.Chat.ID) {
-			msg.Text = "Привет! Я телеграмм бот c расписанием. \nЧтобы продолжить пользоватьсчя вам нужно зарегестрироваться"
+			msg.Text = "Привет! Я телеграмм бот c расписанием. \nЧтобы продолжить пользоваться вам нужно зарегистрироваться"
 			bot.Send(msg)
 			client := http.Client{}
 			// Формируем строку запроса вместе с query string
@@ -55,17 +55,19 @@ func main() {
 			resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 			msg.Text = string(resBody)
 			bot.Send(msg)
-			//Здесь нужно добавить проверку зарегался ли пользователь
-			http.HandleFunc("/gitid", nil)    // Обработчик отвечающий на запроса к /gitid
-			http.ListenAndServe(":8080", nil) // Запуск сервера на порту 8080
-			var r *http.Request
-			github_id := r.URL.Query().Get("githubid")
-			if github_id != "" {
-				chatids[update.Message.Chat.ID] = github_id
-				msg.Text = "Вы успешно зарегестрировались"
-			}
-
+			msg.Text = ""
 			defer response.Body.Close()
+			//Здесь нужно добавить проверку зарегался ли пользователь
+			http.HandleFunc("/gitid", func(w http.ResponseWriter, r *http.Request) { // Обработчик отвечающий на запроса к /gitid
+				log.Printf("github_id:.")
+				github_id := r.URL.Query().Get("githubid")
+				log.Printf("github_id: %s", github_id)
+				if github_id != "" {
+					chatids[update.Message.Chat.ID] = github_id
+					msg.Text = "Вы успешно зарегестрировались"
+				}
+			})
+			http.ListenAndServe(":8080", nil) // Запуск сервера на порту 8080
 		} else {
 			switch update.Message.Text {
 			case "/start":
