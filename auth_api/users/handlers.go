@@ -9,8 +9,11 @@ import (
 )
 
 type UserData struct {
-	Id int64 `json:"id"`
+	Id   int64 `json:"id"`
+	TgId string
 }
+
+var userData UserData
 
 const (
 	CLIENT_ID     = "b783eb30a8893ae6852d"
@@ -18,8 +21,8 @@ const (
 )
 
 func Auth(rw http.ResponseWriter, req *http.Request) {
-	chat_id := req.URL.Query().Get("chatid")
-	var authURL string = "https://github.com/login/oauth/authorize?client_id=" + CLIENT_ID + "&state=" + chat_id
+	userData.TgId = req.URL.Query().Get("chatid")
+	var authURL string = "https://github.com/login/oauth/authorize?client_id=" + CLIENT_ID + "&state=" + userData.TgId
 	fmt.Fprintf(rw, "%s", authURL)
 }
 
@@ -29,13 +32,19 @@ func Oauth_handler(rw http.ResponseWriter, req *http.Request) {
 	code := req.URL.Query().Get("code") // Достаем временный код из запроса
 	if code != "" {
 		accessToken := getAccessToken(code)
-		userData := getUserData(accessToken)
+		userData.Id = getUserData(accessToken)
 
-		if !checkData(userData.Id, "github") { //Проверяем существует ли док с таким id, если нет, то создаём док.
-			register(userData.Id, "github")
+		if !checkData(userData.Id, userData.TgId) { //Проверяем существует ли док с таким id, если нет, то создаём док.
+			register(userData.Id, userData.TgId)
 		}
 		//Пока сайт отображает состояние пользователя, потом сделаю POST запрос на бота с прикреплённым состоянием и github id
-		responseHtml = "<html><body><h1>Вы аутентифицированы и авторизованы!</h1></body></html>"
+		responseHtml = "<html><body><h1>Вы аутентифицированы!</h1></body></html>"
+
+		requesturl := fmt.Sprintf("http://localhost:8080/githubid?githubid=%d", userData.Id)
+		client := http.Client{}
+		request, _ := http.NewRequest("GET", requesturl, nil)
+		response, _ := client.Do(request)
+		defer response.Body.Close()
 	}
 	fmt.Fprint(rw, responseHtml)
 }
@@ -63,7 +72,7 @@ func getAccessToken(code string) string {
 	return responsejson.AccessToken
 }
 
-func getUserData(AccessToken string) UserData {
+func getUserData(AccessToken string) int64 {
 	// Создаём http-клиент с дефолтными настройками
 	client := http.Client{}
 	requestURL := "https://api.github.com/user"
@@ -76,5 +85,5 @@ func getUserData(AccessToken string) UserData {
 
 	var data UserData
 	json.NewDecoder(response.Body).Decode(&data)
-	return data
+	return data.Id
 }
