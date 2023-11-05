@@ -56,9 +56,18 @@ func main() {
 			msg.Text = string(resBody)
 			bot.Send(msg)
 			msg.Text = ""
-			defer response.Body.Close()
+			//defer response.Body.Close()
 			//Здесь нужно добавить проверку зарегался ли пользователь
-			http.HandleFunc("/gitid", func(w http.ResponseWriter, r *http.Request) { // Обработчик отвечающий на запроса к /gitid
+			requestURL = "http://localhost:8080//gitid?"
+			request, _ = http.NewRequest("GET", requestURL, nil)
+			response, _ = client.Do(request)
+			resBody = nil
+			resBody, _ = io.ReadAll(response.Body)
+			if len(resBody) != 19 {
+				chatids[update.Message.Chat.ID] = string(resBody)
+				msg.Text = "Вы успешно зарегестрировались"
+			}
+			/*http.HandleFunc("/gitid", func(w http.ResponseWriter, r *http.Request) { // Обработчик отвечающий на запроса к /gitid
 				log.Printf("github_id:.")
 				github_id := r.URL.Query().Get("githubid")
 				log.Printf("github_id: %s", github_id)
@@ -67,7 +76,7 @@ func main() {
 					msg.Text = "Вы успешно зарегестрировались"
 				}
 			})
-			http.ListenAndServe(":8080", nil) // Запуск сервера на порту 8080
+			http.ListenAndServe(":8080", nil) // Запуск сервера на порту 8080*/
 		} else {
 			switch update.Message.Text {
 			case "/start":
