@@ -31,20 +31,16 @@ func check_role(Chat_ID int64) string {
 }
 func check_data(Chat_ID int64) string {
 	client := http.Client{}
-	// Формируем строку запроса вместе с query string
 	requestURL := fmt.Sprintf("http://localhost:8083//data?chatid=%d", Chat_ID)
-	// Выполняем запрос на сервер. Ответ попадёт в переменную response
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, _ := client.Do(request)
-	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+	resBody, _ := io.ReadAll(response.Body)
 	return string(resBody)
 }
 
 func send_data(Chat_ID int64) string {
 	client := http.Client{}
-	// Формируем строку запроса вместе с query string
 	requestURL := fmt.Sprintf("http://localhost:8083//data?chatid=%d", Chat_ID)
-	// Выполняем запрос на сервер. Ответ попадёт в переменную response
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, _ := client.Do(request)
 	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
@@ -63,7 +59,7 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, _ /*err*/ := bot.GetUpdatesChan(u)
+	updates, _ := bot.GetUpdatesChan(u)
 
 	http.HandleFunc("/gitid", func(w http.ResponseWriter, r *http.Request) { // Обработчик отвечающий на запроса к /gitid
 		log.Printf("github_id:.")
@@ -109,23 +105,75 @@ func main() {
 				case "/help":
 					msg.Text = "Список всех команд: ..."
 				case "toadmin":
-					if check_role(update.Message.Chat.ID) == "admin" {
+					if check_role(update.Message.Chat.ID) == "admin" { //Проверка роли для перехода в админ панель
 						msg.Text = "ссылка на стр панели администратора"
 					} else {
 						msg.Text = "Недостаточно прав"
 					}
 				case "Где следующая пара":
-					msg.Text = "..."
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8084//next_lesson?chatid=%d", update.Message.Chat.ID)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
 				case "Расписание на сегодня":
-					msg.Text = "..."
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8085//today_lessons?chatid=%d", update.Message.Chat.ID)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
 				case "Расписание на завтра":
-					msg.Text = "..."
-				case "":
-					msg.Text = "..."
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8086//tomorrow_lessons?chatid=%d", update.Message.Chat.ID)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
+				case "Расписание на понедельник":
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8087//monday_lessons?chatid=%d", update.Message.Chat.ID)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
+				case "Расписание на вторник":
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8088//tuesday_lessons?chatid=%d", update.Message.Chat.ID)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
+				case "Расписание на среду":
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8089//wednsday_lessons?chatid=%d", update.Message.Chat.ID)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
+				case "Расписание на четверг":
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8090//thursday_lessons?chatid=%d", update.Message.Chat.ID)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
+				case "Расписание на пятницу":
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8091//friday_lessons?chatid=%d", update.Message.Chat.ID)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
+				case "Расписание на субботу":
+					msg.Text = "Выходной. В данный день пар нет."
+				case "Расписание на воскресенье":
+					msg.Text = "Выходной. В данный день пар нет."
 				case " ":
 					msg.Text = "..."
 				case "...":
-					if check_role(update.Message.Chat.ID) == "teacher" {
+					if check_role(update.Message.Chat.ID) == "teacher" { //проверка роли для добавления коментария к паре
 						msg.Text = "..."
 					} else {
 						msg.Text = "Недостаточно прав"
@@ -150,11 +198,9 @@ func main() {
 						bot.Send(msg)
 						msg.Text = ""
 					}
-
 				}
 			}
 		}
 		bot.Send(msg)
 	}
-
 }
