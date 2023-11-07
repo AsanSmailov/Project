@@ -37,14 +37,14 @@ func Oauth_handler(rw http.ResponseWriter, req *http.Request) {
 		if !checkData(userData.Id, userData.TgId) { //Проверяем существует ли док с таким id, если нет, то создаём док.
 			register(userData.Id, userData.TgId)
 		}
-		//Пока сайт отображает состояние пользователя, потом сделаю POST запрос на бота с прикреплённым состоянием и github id
 		responseHtml = "<html><body><h1>Вы аутентифицированы!</h1></body></html>"
 
-		requesturl := fmt.Sprintf("http://localhost:8080/githubid?githubid=%d", userData.Id)
+		requesturl := fmt.Sprintf("http://localhost:8080/gitid?githubid=%d", userData.Id)
 		client := http.Client{}
 		request, _ := http.NewRequest("GET", requesturl, nil)
 		response, _ := client.Do(request)
 		defer response.Body.Close()
+
 	}
 	fmt.Fprint(rw, responseHtml)
 }
