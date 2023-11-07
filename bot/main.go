@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -33,6 +34,18 @@ func main() {
 
 	updates, _ /*err*/ := bot.GetUpdatesChan(u)
 
+	http.HandleFunc("/gitid", func(w http.ResponseWriter, r *http.Request) { // Обработчик отвечающий на запроса к /gitid
+		log.Printf("github_id:.")
+		github_id := r.URL.Query().Get("githubid")
+		chat_id, _ := strconv.ParseInt(r.URL.Query().Get("chatid"), 10, 64)
+		log.Printf("github_id: %s", github_id)
+		if github_id != "" {
+			chatids[chat_id] = github_id
+			bot.Send(tgbotapi.NewMessage(chat_id, "Вы успешно авторизировались!"))
+		}
+	})
+	go func() { http.ListenAndServe(":8081", nil) }() // Запуск сервера на порту 8080
+
 	for update := range updates {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
@@ -44,7 +57,7 @@ func main() {
 		msg.ReplyToMessageID = update.Message.MessageID
 
 		if !check(chatids, update.Message.Chat.ID) {
-			msg.Text = "Привет! Я телеграмм бот c расписанием. \nЧтобы продолжить пользоваться вам нужно зарегистрироваться"
+			msg.Text = "Привет! Я телеграмм бот c расписанием. \nЧтобы продолжить пользоваться вам нужно авторизироваться."
 			bot.Send(msg)
 			client := http.Client{}
 			// Формируем строку запроса вместе с query string
@@ -58,25 +71,16 @@ func main() {
 			msg.Text = ""
 			//defer response.Body.Close()
 			//Здесь нужно добавить проверку зарегался ли пользователь
-			requestURL = "http://localhost:8080//gitid?"
+			/* requestURL = "http://localhost:8080//gitid?"
 			request, _ = http.NewRequest("GET", requestURL, nil)
 			response, _ = client.Do(request)
 			resBody = nil
-			resBody, _ = io.ReadAll(response.Body)
-			if len(resBody) != 19 {
+			resBody, err = io.ReadAll(response.Body)
+			log.Printf(string(resBody))
+			if err == nil {
 				chatids[update.Message.Chat.ID] = string(resBody)
-				msg.Text = "Вы успешно зарегестрировались"
-			}
-			/*http.HandleFunc("/gitid", func(w http.ResponseWriter, r *http.Request) { // Обработчик отвечающий на запроса к /gitid
-				log.Printf("github_id:.")
-				github_id := r.URL.Query().Get("githubid")
-				log.Printf("github_id: %s", github_id)
-				if github_id != "" {
-					chatids[update.Message.Chat.ID] = github_id
-					msg.Text = "Вы успешно зарегестрировались"
-				}
-			})
-			http.ListenAndServe(":8080", nil) // Запуск сервера на порту 8080*/
+				msg.Text = "Вы успешно авторизировались!"
+			} */
 		} else {
 			switch update.Message.Text {
 			case "/start":
