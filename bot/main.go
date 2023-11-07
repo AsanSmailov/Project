@@ -100,129 +100,60 @@ func main() {
 			msg.Text = string(resBody)
 			bot.Send(msg)
 			msg.Text = ""
-
 			//defer response.Body.Close()
-			//Здесь нужно добавить проверку зарегался ли пользователь
 		} else {
-			if check_role(update.Message.Chat.ID) == "admin" {
-				if check_data(update.Message.Chat.ID) == "true" {
-					switch update.Message.Text {
-					case "/start":
-						msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
-					case "/help":
-						msg.Text = "Список всех команд: ..."
-					case "toadmin":
-						//if role==admin{
+			if check_data(update.Message.Chat.ID) == "true" {
+				switch update.Message.Text {
+				case "/start":
+					msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
+				case "/help":
+					msg.Text = "Список всех команд: ..."
+				case "toadmin":
+					if check_role(update.Message.Chat.ID) == "admin" {
 						msg.Text = "ссылка на стр панели администратора"
-						//}
-					default:
-						msg.Text = "Я не понимаю, что вы хотите сказать."
+					} else {
+						msg.Text = "Недостаточно прав"
 					}
-				} else {
-					msg.Text = "Необходимо отправить данные: ФИО, группа"
-					bot.Send(msg)
-					for update := range updates {
-						if update.Message == nil { // ignore any non-Message Updates
-							continue
-						}
-						if send_data(update.Message.Chat.ID) == "true" {
-							msg.Text = "Данные успешно записанны."
-							bot.Send(msg)
-							msg.Text = ""
-							break
-						} else {
-							msg.Text = "Ошибка! Не удалось записать данные."
-							bot.Send(msg)
-							msg.Text = ""
-						}
-
+				case "Где следующая пара":
+					msg.Text = "..."
+				case "Расписание на сегодня":
+					msg.Text = "..."
+				case "Расписание на завтра":
+					msg.Text = "..."
+				case "":
+					msg.Text = "..."
+				case " ":
+					msg.Text = "..."
+				case "...":
+					if check_role(update.Message.Chat.ID) == "teacher" {
+						msg.Text = "..."
+					} else {
+						msg.Text = "Недостаточно прав"
 					}
-				}
-			} else if check_role(update.Message.Chat.ID) == "teacher" {
-				if check_data(update.Message.Chat.ID) == "true" {
-					switch update.Message.Text {
-					case "/start":
-						msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
-					case "/help":
-						msg.Text = "Список всех команд: ..."
-					case "Где следующая пара":
-						msg.Text = "..."
-					case "Расписание на сегодня":
-						msg.Text = "..."
-					case "Расписание на завтра":
-						msg.Text = "..."
-					case "":
-						msg.Text = "..."
-					case " ":
-						msg.Text = "..."
-					case "...":
-						msg.Text = "..."
-					default:
-						msg.Text = "Я не понимаю, что вы хотите сказать."
-					}
-				} else {
-					msg.Text = "Необходимо отправить данные: ФИО, группа"
-					bot.Send(msg)
-					for update := range updates {
-						if update.Message == nil { // ignore any non-Message Updates
-							continue
-						}
-						if send_data(update.Message.Chat.ID) == "true" {
-							msg.Text = "Данные успешно записанны."
-							bot.Send(msg)
-							msg.Text = ""
-							break
-						} else {
-							msg.Text = "Ошибка! Не удалось записать данные."
-							bot.Send(msg)
-							msg.Text = ""
-						}
-					}
+				default:
+					msg.Text = "Я не понимаю, что вы хотите сказать."
 				}
 			} else {
-				if check_data(update.Message.Chat.ID) == "true" {
-					switch update.Message.Text {
-					case "/start":
-						msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
-					case "/help":
-						msg.Text = "Список всех команд: ..."
-					case "Где следующая пара":
-						msg.Text = "..."
-					case "Расписание на сегодня":
-						msg.Text = "..."
-					case "Расписание на завтра":
-						msg.Text = "..."
-					case "":
-						msg.Text = "..."
-					case " ":
-						msg.Text = "..."
-					case "...":
-						msg.Text = "..."
-					default:
-						msg.Text = "Я не понимаю, что вы хотите сказать."
+				msg.Text = "Необходимо отправить данные: ФИО, группа"
+				bot.Send(msg)
+				for update := range updates {
+					if update.Message == nil { // ignore any non-Message Updates
+						continue
 					}
-				} else {
-					msg.Text = "Необходимо отправить данные: ФИО, группа"
-					bot.Send(msg)
-					for update := range updates {
-						if update.Message == nil { // ignore any non-Message Updates
-							continue
-						}
-						if send_data(update.Message.Chat.ID) == "true" {
-							msg.Text = "Данные успешно записанны."
-							bot.Send(msg)
-							msg.Text = ""
-							break
-						} else {
-							msg.Text = "Ошибка! Не удалось записать данные."
-							bot.Send(msg)
-							msg.Text = ""
-						}
+					if send_data(update.Message.Chat.ID) == "true" {
+						msg.Text = "Данные успешно записанны."
+						bot.Send(msg)
+						msg.Text = ""
+						break
+					} else {
+						msg.Text = "Ошибка! Не удалось записать данные."
+						bot.Send(msg)
+						msg.Text = ""
 					}
+
 				}
 			}
 		}
-
 		bot.Send(msg)
 	}
 
