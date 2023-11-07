@@ -19,9 +19,40 @@ func check(chatids map[int64]string, Chat_ID int64) bool {
 	return false
 }
 
+func check_role(Chat_ID int64) string {
+	client := http.Client{}
+	// Формируем строку запроса вместе с query string
+	requestURL := fmt.Sprintf("http://localhost:8082//role?chatid=%d", Chat_ID)
+	// Выполняем запрос на сервер. Ответ попадёт в переменную response
+	request, _ := http.NewRequest("GET", requestURL, nil)
+	response, _ := client.Do(request)
+	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+	return string(resBody)
+}
+func check_data(Chat_ID int64) string {
+	client := http.Client{}
+	// Формируем строку запроса вместе с query string
+	requestURL := fmt.Sprintf("http://localhost:8083//data?chatid=%d", Chat_ID)
+	// Выполняем запрос на сервер. Ответ попадёт в переменную response
+	request, _ := http.NewRequest("GET", requestURL, nil)
+	response, _ := client.Do(request)
+	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+	return string(resBody)
+}
+
+func send_data(Chat_ID int64) string {
+	client := http.Client{}
+	// Формируем строку запроса вместе с query string
+	requestURL := fmt.Sprintf("http://localhost:8083//data?chatid=%d", Chat_ID)
+	// Выполняем запрос на сервер. Ответ попадёт в переменную response
+	request, _ := http.NewRequest("GET", requestURL, nil)
+	response, _ := client.Do(request)
+	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+	return string(resBody)
+}
+
 func main() {
 	chatids := make(map[int64]string)
-	//chatids := make([]int64, 0) //масив для хранения chatid,потом исправлю на map когда буду получать id github
 	bot, err := tgbotapi.NewBotAPI("6320552220:AAFd90gcVVs0tLR4uXNPzcAL_thmjFAXt4U")
 	if err != nil {
 		log.Panic(err)
@@ -44,7 +75,7 @@ func main() {
 			bot.Send(tgbotapi.NewMessage(chat_id, "Вы успешно авторизировались!"))
 		}
 	})
-	go func() { http.ListenAndServe(":8081", nil) }() // Запуск сервера на порту 8080
+	go func() { http.ListenAndServe(":8081", nil) }() // Запуск сервера на порту 8081
 
 	for update := range updates {
 		if update.Message == nil { // ignore any non-Message Updates
@@ -69,40 +100,126 @@ func main() {
 			msg.Text = string(resBody)
 			bot.Send(msg)
 			msg.Text = ""
+
 			//defer response.Body.Close()
 			//Здесь нужно добавить проверку зарегался ли пользователь
-			/* requestURL = "http://localhost:8080//gitid?"
-			request, _ = http.NewRequest("GET", requestURL, nil)
-			response, _ = client.Do(request)
-			resBody = nil
-			resBody, err = io.ReadAll(response.Body)
-			log.Printf(string(resBody))
-			if err == nil {
-				chatids[update.Message.Chat.ID] = string(resBody)
-				msg.Text = "Вы успешно авторизировались!"
-			} */
 		} else {
-			switch update.Message.Text {
-			case "/start":
-				msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
-			case "/help":
-				if check(chatids, update.Message.Chat.ID) {
-					msg.Text = "Список всех команд: ..."
-				}
-			case "toadmin":
-				//if role==admin{
-				msg.Text = "ссылка на стр панели администратора"
-				//}
-			case "Где следующая пара":
-				msg.Text = "..."
-			case "Расписание на сегодня":
-				msg.Text = "..."
-			case "Расписание на завтра":
-				msg.Text = "..."
-			case "c":
+			if check_role(update.Message.Chat.ID) == "admin" {
+				if check_data(update.Message.Chat.ID) == "true" {
+					switch update.Message.Text {
+					case "/start":
+						msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
+					case "/help":
+						msg.Text = "Список всех команд: ..."
+					case "toadmin":
+						//if role==admin{
+						msg.Text = "ссылка на стр панели администратора"
+						//}
+					default:
+						msg.Text = "Я не понимаю, что вы хотите сказать."
+					}
+				} else {
+					msg.Text = "Необходимо отправить данные: ФИО, группа"
+					bot.Send(msg)
+					for update := range updates {
+						if update.Message == nil { // ignore any non-Message Updates
+							continue
+						}
+						if send_data(update.Message.Chat.ID) == "true" {
+							msg.Text = "Данные успешно записанны."
+							bot.Send(msg)
+							msg.Text = ""
+							break
+						} else {
+							msg.Text = "Ошибка! Не удалось записать данные."
+							bot.Send(msg)
+							msg.Text = ""
+						}
 
-			default:
-				msg.Text = "Я не понимаю, что вы хотите сказать."
+					}
+				}
+			} else if check_role(update.Message.Chat.ID) == "teacher" {
+				if check_data(update.Message.Chat.ID) == "true" {
+					switch update.Message.Text {
+					case "/start":
+						msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
+					case "/help":
+						msg.Text = "Список всех команд: ..."
+					case "Где следующая пара":
+						msg.Text = "..."
+					case "Расписание на сегодня":
+						msg.Text = "..."
+					case "Расписание на завтра":
+						msg.Text = "..."
+					case "":
+						msg.Text = "..."
+					case " ":
+						msg.Text = "..."
+					case "...":
+						msg.Text = "..."
+					default:
+						msg.Text = "Я не понимаю, что вы хотите сказать."
+					}
+				} else {
+					msg.Text = "Необходимо отправить данные: ФИО, группа"
+					bot.Send(msg)
+					for update := range updates {
+						if update.Message == nil { // ignore any non-Message Updates
+							continue
+						}
+						if send_data(update.Message.Chat.ID) == "true" {
+							msg.Text = "Данные успешно записанны."
+							bot.Send(msg)
+							msg.Text = ""
+							break
+						} else {
+							msg.Text = "Ошибка! Не удалось записать данные."
+							bot.Send(msg)
+							msg.Text = ""
+						}
+					}
+				}
+			} else {
+				if check_data(update.Message.Chat.ID) == "true" {
+					switch update.Message.Text {
+					case "/start":
+						msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
+					case "/help":
+						msg.Text = "Список всех команд: ..."
+					case "Где следующая пара":
+						msg.Text = "..."
+					case "Расписание на сегодня":
+						msg.Text = "..."
+					case "Расписание на завтра":
+						msg.Text = "..."
+					case "":
+						msg.Text = "..."
+					case " ":
+						msg.Text = "..."
+					case "...":
+						msg.Text = "..."
+					default:
+						msg.Text = "Я не понимаю, что вы хотите сказать."
+					}
+				} else {
+					msg.Text = "Необходимо отправить данные: ФИО, группа"
+					bot.Send(msg)
+					for update := range updates {
+						if update.Message == nil { // ignore any non-Message Updates
+							continue
+						}
+						if send_data(update.Message.Chat.ID) == "true" {
+							msg.Text = "Данные успешно записанны."
+							bot.Send(msg)
+							msg.Text = ""
+							break
+						} else {
+							msg.Text = "Ошибка! Не удалось записать данные."
+							bot.Send(msg)
+							msg.Text = ""
+						}
+					}
+				}
 			}
 		}
 
