@@ -3,7 +3,6 @@ package users
 import (
 	"context"
 	"log"
-	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,9 +10,8 @@ import (
 )
 
 type About struct {
-	FirstName string `bson:"first_name"`
-	LastName  string `bson:"last_name"`
-	Group     string `bson:"group"`
+	FullName string `bson:"full_name"`
+	Group    string `bson:"group"`
 }
 
 type User struct {
@@ -23,18 +21,15 @@ type User struct {
 	About    About  `bson:"about"`
 }
 
-func checkData(githubID int64, tgID string) bool {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
+func checkData(githubID int64, tgID int64) bool {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	err = client.Connect(context.TODO())
 	err = client.Ping(context.TODO(), nil)
 
 	collection := client.Database("UsersDB").Collection("user")
-	id, err1 := strconv.ParseInt(tgID, 10, 64)
-	if err1 != nil {
-		log.Fatal(err1)
-	}
-	filter := bson.D{{"github_id", githubID}, {"tg_ id", id}}
 
+	filter := bson.D{{"github_id", githubID}, {"tg_id", tgID}}
+	log.Print(tgID, " ", githubID)
 	var result User
 
 	err = collection.FindOne(context.TODO(), filter).Decode(&result)
@@ -46,23 +41,18 @@ func checkData(githubID int64, tgID string) bool {
 	}
 }
 
-func register(githubId int64, tgID string) {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
+func register(githubID int64, tgID int64) {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	err = client.Connect(context.TODO())
 	err = client.Ping(context.TODO(), nil)
 
 	collection := client.Database("UsersDB").Collection("user")
-
 	var user User
-	id, err1 := strconv.ParseInt(tgID, 10, 64)
-	if err1 != nil {
-		log.Fatal(err1)
-	}
-	user.GithubID = githubId
-	user.TgId = id
+	log.Print(tgID, " ", githubID)
+	user.GithubID = githubID
+	user.TgId = tgID
 	user.Role = "student"
-	user.About.FirstName = ""
-	user.About.LastName = ""
+	user.About.FullName = ""
 	user.About.Group = ""
 
 	_, err = collection.InsertOne(context.TODO(), user)
