@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +11,13 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+func messageToString(message *tgbotapi.Message) (string, error) {
+	messageJSON, err := json.Marshal(message)
+	if err != nil {
+		return "", err
+	}
+	return string(messageJSON), nil
+}
 func check(chatids map[int64]string, Chat_ID int64) bool {
 	for user, _ := range chatids {
 		if user == Chat_ID {
@@ -22,7 +30,7 @@ func check(chatids map[int64]string, Chat_ID int64) bool {
 func check_role(Chat_ID int64) string {
 	client := http.Client{}
 	// Формируем строку запроса вместе с query string
-	requestURL := fmt.Sprintf("http://localhost:8082//role?chatid=%d", Chat_ID)
+	requestURL := fmt.Sprintf("http://localhost:8080//role?chatid=%d", Chat_ID)
 	// Выполняем запрос на сервер. Ответ попадёт в переменную response
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, _ := client.Do(request)
@@ -31,16 +39,17 @@ func check_role(Chat_ID int64) string {
 }
 func check_data(Chat_ID int64) string {
 	client := http.Client{}
-	requestURL := fmt.Sprintf("http://localhost:8083//data?chatid=%d", Chat_ID)
+	requestURL := fmt.Sprintf("http://localhost:8080//data?chatid=%d", Chat_ID)
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, _ := client.Do(request)
 	resBody, _ := io.ReadAll(response.Body)
 	return string(resBody)
 }
 
-func send_data(Chat_ID int64) string {
+func send_data(Chat_ID int64, Message *tgbotapi.Message) string {
 	client := http.Client{}
-	requestURL := fmt.Sprintf("http://localhost:8083//data?chatid=%d", Chat_ID)
+	message, _ := messageToString(Message)
+	requestURL := fmt.Sprintf("http://localhost:8080//data?chatid=%d&data=%s", Chat_ID, message)
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, _ := client.Do(request)
 	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
@@ -112,56 +121,56 @@ func main() {
 					}
 				case "Где следующая пара":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8084//next_lesson?chatid=%d", update.Message.Chat.ID)
+					requestURL := fmt.Sprintf("http://localhost:8082//next_lesson?chatid=%d", update.Message.Chat.ID)
 					request, _ := http.NewRequest("GET", requestURL, nil)
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
 				case "Расписание на сегодня":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8085//today_lessons?chatid=%d", update.Message.Chat.ID)
+					requestURL := fmt.Sprintf("http://localhost:8082//today_lessons?chatid=%d", update.Message.Chat.ID)
 					request, _ := http.NewRequest("GET", requestURL, nil)
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
 				case "Расписание на завтра":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8086//tomorrow_lessons?chatid=%d", update.Message.Chat.ID)
+					requestURL := fmt.Sprintf("http://localhost:8082//tomorrow_lessons?chatid=%d", update.Message.Chat.ID)
 					request, _ := http.NewRequest("GET", requestURL, nil)
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
 				case "Расписание на понедельник":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8087//monday_lessons?chatid=%d", update.Message.Chat.ID)
+					requestURL := fmt.Sprintf("http://localhost:8082//monday_lessons?chatid=%d", update.Message.Chat.ID)
 					request, _ := http.NewRequest("GET", requestURL, nil)
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
 				case "Расписание на вторник":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8088//tuesday_lessons?chatid=%d", update.Message.Chat.ID)
+					requestURL := fmt.Sprintf("http://localhost:8082//tuesday_lessons?chatid=%d", update.Message.Chat.ID)
 					request, _ := http.NewRequest("GET", requestURL, nil)
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
 				case "Расписание на среду":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8089//wednsday_lessons?chatid=%d", update.Message.Chat.ID)
+					requestURL := fmt.Sprintf("http://localhost:8082//wednsday_lessons?chatid=%d", update.Message.Chat.ID)
 					request, _ := http.NewRequest("GET", requestURL, nil)
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
 				case "Расписание на четверг":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8090//thursday_lessons?chatid=%d", update.Message.Chat.ID)
+					requestURL := fmt.Sprintf("http://localhost:8082//thursday_lessons?chatid=%d", update.Message.Chat.ID)
 					request, _ := http.NewRequest("GET", requestURL, nil)
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
 				case "Расписание на пятницу":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8091//friday_lessons?chatid=%d", update.Message.Chat.ID)
+					requestURL := fmt.Sprintf("http://localhost:8082//friday_lessons?chatid=%d", update.Message.Chat.ID)
 					request, _ := http.NewRequest("GET", requestURL, nil)
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
@@ -182,13 +191,29 @@ func main() {
 					msg.Text = "Я не понимаю, что вы хотите сказать."
 				}
 			} else {
-				msg.Text = "Необходимо отправить данные: ФИО, группа"
+				msg.Text = "Необходимо отправить данные!"
+				bot.Send(msg)
+				msg.Text = "Отправте ваше ФИО"
 				bot.Send(msg)
 				for update := range updates {
 					if update.Message == nil { // ignore any non-Message Updates
 						continue
 					}
-					if send_data(update.Message.Chat.ID) == "true" {
+					if send_data(update.Message.Chat.ID, update.Message) == "true" {
+						msg.Text = "Данные успешно записанны."
+						bot.Send(msg)
+						msg.Text = ""
+						break
+					} else {
+						msg.Text = "Ошибка! Не удалось записать данные."
+						bot.Send(msg)
+						msg.Text = ""
+					}
+				}
+				msg.Text = "Отправте вашу группу"
+				bot.Send(msg)
+				for update := range updates {
+					if send_data(update.Message.Chat.ID, update.Message) == "true" {
 						msg.Text = "Данные успешно записанны."
 						bot.Send(msg)
 						msg.Text = ""
