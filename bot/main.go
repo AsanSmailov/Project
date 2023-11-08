@@ -38,9 +38,9 @@ func check_data(Chat_ID int64) string {
 	return string(resBody)
 }
 
-func send_data(Chat_ID int64, Message string) string {
+func send_data(Chat_ID int64, Message string, datatype string) string {
 	client := http.Client{}
-	requestURL := fmt.Sprintf("http://localhost:8080//data?chatid=%d&data=%s", Chat_ID, Message)
+	requestURL := fmt.Sprintf("http://localhost:8080//data?chatid=%d&data=%s&datatype=%s", Chat_ID, Message, datatype)
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, _ := client.Do(request)
 	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
@@ -190,7 +190,7 @@ func main() {
 					if update.Message == nil { // ignore any non-Message Updates
 						continue
 					}
-					if send_data(update.Message.Chat.ID, update.Message.Text) == "true" {
+					if send_data(update.Message.Chat.ID, update.Message.Text, "full_name") == "true" {
 						msg.Text = "Данные успешно записанны."
 						bot.Send(msg)
 						msg.Text = ""
@@ -204,7 +204,7 @@ func main() {
 				msg.Text = "Отправте вашу группу"
 				bot.Send(msg)
 				for update := range updates {
-					if send_data(update.Message.Chat.ID, update.Message.Text) == "true" {
+					if send_data(update.Message.Chat.ID, update.Message.Text, "group") == "true" {
 						msg.Text = "Данные успешно записанны."
 						bot.Send(msg)
 						msg.Text = ""
