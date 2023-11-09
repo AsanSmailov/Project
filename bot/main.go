@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -13,13 +12,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func messageToString(message *tgbotapi.Message) (string, error) {
-	messageJSON, err := json.Marshal(message)
-	if err != nil {
-		return "", err
-	}
-	return string(messageJSON), nil
-}
 func check(chatids map[int64]string, Chat_ID int64) bool {
 	for user, _ := range chatids {
 		if user == Chat_ID {
@@ -51,7 +43,7 @@ func check_data(Chat_ID int64) string {
 
 func send_data(Chat_ID int64, message string, datatype string) string {
 	client := http.Client{}
-	requestURL := fmt.Sprintf("http://localhost:8080/sendAbout")
+	requestURL := "http://localhost:8080/sendAbout"
 
 	form := url.Values{}
 	form.Add("chatid", strconv.FormatInt(Chat_ID, 10))
@@ -210,7 +202,6 @@ func main() {
 					if update.Message == nil { // ignore any non-Message Updates
 						continue
 					}
-					log.Print(update.Message.Text)
 					if send_data(update.Message.Chat.ID, update.Message.Text, "full_name") == "true" {
 						msg.Text = "Данные успешно записаны."
 						bot.Send(msg)
@@ -222,7 +213,7 @@ func main() {
 						msg.Text = ""
 					}
 				}
-				msg.Text = "Отправте вашу группу (прим. ИВТ-123, ПМИ-123, ПИ-123 и т.д)"
+				msg.Text = "Отправте вашу группу (прим. ИВТ-123(1), ПМИ-123(2), ПИ-123(1) и т.д)"
 				bot.Send(msg)
 				for update := range updates {
 					if send_data(update.Message.Chat.ID, update.Message.Text, "group") == "true" {
