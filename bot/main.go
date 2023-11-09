@@ -94,7 +94,17 @@ func main() {
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 		msg.ReplyToMessageID = update.Message.MessageID
-
+		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
+			tgbotapi.NewKeyboardButtonRow(
+				tgbotapi.NewKeyboardButton("Где следующая пара"),
+				tgbotapi.NewKeyboardButton("Расписание на сегодня"),
+				tgbotapi.NewKeyboardButton("Расписание на завтра"),
+			),
+			tgbotapi.NewKeyboardButtonRow(
+				tgbotapi.NewKeyboardButton("Расписание на дни недели"),
+				tgbotapi.NewKeyboardButton("toadmin"),
+			),
+		)
 		if !check(chatids, update.Message.Chat.ID) {
 			msg.Text = "Привет! Я телеграмм бот c расписанием. \nЧтобы продолжить пользоваться вам нужно авторизироваться."
 			bot.Send(msg)
@@ -143,6 +153,23 @@ func main() {
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
+				case "Расписание на дни недели":
+					newKeyboard := tgbotapi.NewMessage(update.Message.Chat.ID, "Выберите день недели:")
+					newKeyboard.ReplyMarkup = tgbotapi.NewReplyKeyboard(
+						tgbotapi.NewKeyboardButtonRow(
+							tgbotapi.NewKeyboardButton("Расписание на понедельник"),
+							tgbotapi.NewKeyboardButton("Расписание на вторник"),
+							tgbotapi.NewKeyboardButton("Расписание на среду"),
+							tgbotapi.NewKeyboardButton("Расписание на четверг"),
+						),
+						tgbotapi.NewKeyboardButtonRow(
+							tgbotapi.NewKeyboardButton("Расписание на пятницу"),
+							tgbotapi.NewKeyboardButton("Расписание на субботу"),
+							tgbotapi.NewKeyboardButton("Расписание на воскресенье"),
+							tgbotapi.NewKeyboardButton("Назад"),
+						),
+					)
+					bot.Send(newKeyboard)
 				case "Расписание на понедельник":
 					client := http.Client{}
 					requestURL := fmt.Sprintf("http://localhost:8082//monday_lessons?chatid=%d", update.Message.Chat.ID)
@@ -190,6 +217,18 @@ func main() {
 					} else {
 						msg.Text = "Недостаточно прав"
 					}
+				case "Назад":
+					msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
+						tgbotapi.NewKeyboardButtonRow(
+							tgbotapi.NewKeyboardButton("Где следующая пара"),
+							tgbotapi.NewKeyboardButton("Расписание на сегодня"),
+							tgbotapi.NewKeyboardButton("Расписание на завтра"),
+						),
+						tgbotapi.NewKeyboardButtonRow(
+							tgbotapi.NewKeyboardButton("Расписание на дни недели"),
+							tgbotapi.NewKeyboardButton("toadmin"),
+						),
+					)
 				default:
 					msg.Text = "Я не понимаю, что вы хотите сказать."
 				}
