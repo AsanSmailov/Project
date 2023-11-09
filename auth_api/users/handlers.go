@@ -27,7 +27,6 @@ func Auth(rw http.ResponseWriter, req *http.Request) {
 	var str string
 	str = strconv.FormatInt(tg_id, 10)
 	data[tg_id]++
-	log.Print(data[tg_id])
 	var authURL string = "https://github.com/login/oauth/authorize?client_id=" + CLIENT_ID + "&state=" + str
 	fmt.Fprintf(rw, "%s", authURL)
 }
@@ -38,11 +37,10 @@ func Oauth_handler(rw http.ResponseWriter, req *http.Request) {
 	code := req.URL.Query().Get("code") // Достаем временный код из запроса
 	tg_id, _ := strconv.ParseInt(req.URL.Query().Get("state"), 10, 64)
 	_, ok := data[tg_id]
-	log.Print(data[tg_id])
+
 	if code != "" && ok {
 		accessToken := getAccessToken(code)
 		data[tg_id] = getUserData(accessToken)
-		log.Print(data)
 
 		if !checkData(data[tg_id], tg_id) { //Проверяем существует ли док с таким id, если нет, то создаём док.
 			register(data[tg_id], tg_id)
@@ -50,7 +48,6 @@ func Oauth_handler(rw http.ResponseWriter, req *http.Request) {
 		responseHtml = "<html><body><h1>Вы аутентифицированы!</h1></body></html>"
 
 		url := "http://localhost:8081/gitid?githubid=" + strconv.FormatInt(data[tg_id], 10) + "&chatid=" + strconv.FormatInt(tg_id, 10)
-		log.Print(url)
 		requesturl := fmt.Sprintf(url)
 		client := http.Client{}
 		request, _ := http.NewRequest("GET", requesturl, nil)
@@ -62,6 +59,35 @@ func Oauth_handler(rw http.ResponseWriter, req *http.Request) {
 	fmt.Fprint(rw, responseHtml)
 }
 
+func CheckAbout(rw http.ResponseWriter, req *http.Request) {
+	tg_id, _ := strconv.ParseInt(req.URL.Query().Get("chatid"), 10, 64)
+	user := getData(tg_id)
+
+	if user.About.Group == "" && user.About.FullName == "" {
+		fmt.Fprintf(rw, "%t", false)
+	} else {
+		fmt.Fprintf(rw, "%t", true)
+	}
+}
+
+func SendAbout(rw http.ResponseWriter, req *http.Request) {
+	tg_id, _ := strconv.ParseInt(req.FormValue("chatid"), 10, 64)
+	data := req.FormValue("data")
+	datatype := req.FormValue("datatype")
+
+	log.Print("sendAbout logs:", tg_id, " ", data, " ", datatype)
+	fmt.Fprintf(rw, "%t", inputData(tg_id, data, datatype))
+}
+
+func GetRole(rw http.ResponseWriter, req *http.Request) {
+	tg_id, _ := strconv.ParseInt(req.URL.Query().Get("chatid"), 10, 64)
+	user := getData(tg_id)
+	fmt.Print("GetRole log:", user.Role)
+
+	fmt.Fprintf(rw, "%s", user.Role)
+}
+
+// Для Oauth_handler
 func getAccessToken(code string) string {
 	client := http.Client{}
 	requestURL := "https://github.com/login/oauth/access_token"
