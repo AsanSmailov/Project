@@ -61,3 +61,48 @@ func register(githubID int64, tgID int64) {
 	}
 	err = client.Disconnect(context.TODO())
 }
+
+func getData(tgID int64) User {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	err = client.Connect(context.TODO())
+	err = client.Ping(context.TODO(), nil)
+
+	collection := client.Database("UsersDB").Collection("user")
+
+	filter := bson.D{{"tg_id", tgID}}
+
+	var result User
+
+	err = collection.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = client.Disconnect(context.TODO())
+	return result
+}
+
+func inputData(tgID int64, data string, datatype string) bool {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	err = client.Connect(context.TODO())
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	collection := client.Database("UsersDB").Collection("user")
+	filter := bson.D{{"tg_id", tgID}}
+	var replacement bson.D
+	if datatype != "role" {
+		replacement = bson.D{{"$set", bson.D{{"about." + datatype, data}}}}
+	} else {
+		replacement = bson.D{{datatype, data}}
+	}
+	_, err1 := collection.UpdateOne(context.TODO(), filter, replacement)
+	if err1 != nil {
+		err1 = client.Disconnect(context.TODO())
+		return false
+	} else {
+		err = client.Disconnect(context.TODO())
+		return true
+	}
+}
