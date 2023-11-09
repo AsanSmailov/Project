@@ -1,15 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+func messageToString(message *tgbotapi.Message) (string, error) {
+	messageJSON, err := json.Marshal(message)
+	if err != nil {
+		return "", err
+	}
+	return string(messageJSON), nil
+}
 func check(chatids map[int64]string, Chat_ID int64) bool {
 	for user, _ := range chatids {
 		if user == Chat_ID {
@@ -19,31 +29,41 @@ func check(chatids map[int64]string, Chat_ID int64) bool {
 	return false
 }
 
-func check_role(Chat_ID int64) string {
+func get_role(Chat_ID int64) string {
 	client := http.Client{}
 	// Формируем строку запроса вместе с query string
-	requestURL := fmt.Sprintf("http://localhost:8080//role?chatid=%d", Chat_ID)
+	requestURL := fmt.Sprintf("http://localhost:8080/getRole?chatid=%d", Chat_ID)
 	// Выполняем запрос на сервер. Ответ попадёт в переменную response
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, _ := client.Do(request)
 	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+	fmt.Print("ger_role log:", string(resBody))
 	return string(resBody)
 }
 func check_data(Chat_ID int64) string {
 	client := http.Client{}
-	requestURL := fmt.Sprintf("http://localhost:8080//data?chatid=%d", Chat_ID)
+	requestURL := fmt.Sprintf("http://localhost:8080/checkAbout?chatid=%d", Chat_ID)
 	request, _ := http.NewRequest("GET", requestURL, nil)
 	response, _ := client.Do(request)
 	resBody, _ := io.ReadAll(response.Body)
 	return string(resBody)
 }
 
-func send_data(Chat_ID int64, Message string, datatype string) string {
+func send_data(Chat_ID int64, message string, datatype string) string {
 	client := http.Client{}
-	requestURL := fmt.Sprintf("http://localhost:8080//data?chatid=%d&data=%s&datatype=%s", Chat_ID, Message, datatype)
-	request, _ := http.NewRequest("GET", requestURL, nil)
+	requestURL := fmt.Sprintf("http://localhost:8080/sendAbout")
+
+	form := url.Values{}
+	form.Add("chatid", strconv.FormatInt(Chat_ID, 10))
+	form.Add("data", message)
+	form.Add("datatype", datatype)
+
+	request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
 	response, _ := client.Do(request)
 	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+
 	return string(resBody)
 }
 
@@ -105,7 +125,7 @@ func main() {
 				case "/help":
 					msg.Text = "Список всех команд: ..."
 				case "toadmin":
-					if check_role(update.Message.Chat.ID) == "admin" { //Проверка роли для перехода в админ панель
+					if get_role(update.Message.Chat.ID) == "admin" { //Проверка роли для перехода в админ панель
 						msg.Text = "ссылка на стр панели администратора"
 					} else {
 						msg.Text = "Недостаточно прав"
@@ -173,7 +193,7 @@ func main() {
 				case " ":
 					msg.Text = "..."
 				case "...":
-					if check_role(update.Message.Chat.ID) == "teacher" { //проверка роли для добавления коментария к паре
+					if get_role(update.Message.Chat.ID) == "teacher" { //проверка роли для добавления коментария к паре
 						msg.Text = "..."
 					} else {
 						msg.Text = "Недостаточно прав"
@@ -184,14 +204,15 @@ func main() {
 			} else {
 				msg.Text = "Необходимо отправить данные!"
 				bot.Send(msg)
-				msg.Text = "Отправте ваше ФИО"
+				msg.Text = "Отправте ваше ФИО (прим. Иванов Иван Иванович)"
 				bot.Send(msg)
 				for update := range updates {
 					if update.Message == nil { // ignore any non-Message Updates
 						continue
 					}
+					log.Print(update.Message.Text)
 					if send_data(update.Message.Chat.ID, update.Message.Text, "full_name") == "true" {
-						msg.Text = "Данные успешно записанны."
+						msg.Text = "Данные успешно записаны."
 						bot.Send(msg)
 						msg.Text = ""
 						break
@@ -201,11 +222,11 @@ func main() {
 						msg.Text = ""
 					}
 				}
-				msg.Text = "Отправте вашу группу"
+				msg.Text = "Отправте вашу группу (прим. ИВТ-123, ПМИ-123, ПИ-123 и т.д)"
 				bot.Send(msg)
 				for update := range updates {
 					if send_data(update.Message.Chat.ID, update.Message.Text, "group") == "true" {
-						msg.Text = "Данные успешно записанны."
+						msg.Text = "Данные успешно записаны."
 						bot.Send(msg)
 						msg.Text = ""
 						break
