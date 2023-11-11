@@ -59,6 +59,22 @@ func send_data(Chat_ID int64, message string, datatype string) string {
 	return string(resBody)
 }
 
+func request_jwt(Chat_ID int64) string {
+	client := http.Client{}
+	requestURL := "http://localhost:8080/sendAbout"
+
+	form := url.Values{}
+	form.Add("chatid", strconv.FormatInt(Chat_ID, 10))
+
+	request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	response, _ := client.Do(request)
+	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+
+	return string(resBody)
+}
+
 func main() {
 	chatids := make(map[int64]string)
 	bot, err := tgbotapi.NewBotAPI("6320552220:AAFd90gcVVs0tLR4uXNPzcAL_thmjFAXt4U")
@@ -130,7 +146,7 @@ func main() {
 				case "/start":
 					msg.Text = "Привет! Я телеграмм бот c расписанием. \nНажми /help чтобы увидеть все команды."
 				case "/help":
-					msg.Text = "Список всех команд: ..."
+					msg.Text = "Список всех команд: \n- Где следующая пара\n- Расписание на день недели\n- Расписание на сегодня\n- Расписание на завтра\n- Оставить комментарий к паре /n- Где группа \n- Где преподаватель\n- toadmin"
 				case "toadmin":
 					if get_role(update.Message.Chat.ID) == "admin" { //Проверка роли для перехода в админ панель
 						msg.Text = "ссылка на стр панели администратора"
@@ -139,24 +155,33 @@ func main() {
 					}
 				case "Где следующая пара":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//next_lesson?chatid=%d", update.Message.Chat.ID)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//next_lesson")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Расписание на сегодня":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//today_lessons?chatid=%d", update.Message.Chat.ID)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//today_lessons")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Расписание на завтра":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//tomorrow_lessons?chatid=%d", update.Message.Chat.ID)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//tomorrow_lessons")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Расписание на дни недели":
 					newKeyboard := tgbotapi.NewMessage(update.Message.Chat.ID, "Выберите день недели:")
@@ -177,38 +202,53 @@ func main() {
 					bot.Send(newKeyboard)
 				case "Расписание на понедельник":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//monday_lessons?chatid=%d", update.Message.Chat.ID)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//monday_lessons")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Расписание на вторник":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//tuesday_lessons?chatid=%d", update.Message.Chat.ID)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//tuesday_lessons")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Расписание на среду":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//wednsday_lessons?chatid=%d", update.Message.Chat.ID)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//wednsday_lessons")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Расписание на четверг":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//thursday_lessons?chatid=%d", update.Message.Chat.ID)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//thursday_lessons")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Расписание на пятницу":
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//friday_lessons?chatid=%d", update.Message.Chat.ID)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//friday_lessons")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Расписание на субботу":
 					msg.Text = "Выходной. В данный день пар нет."
@@ -238,10 +278,15 @@ func main() {
 							group = update.Message.Text
 						}
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8082//com_to_lesson?num_of_lesson=%s&group=%s", num_of_lesson, group)
-						request, _ := http.NewRequest("GET", requestURL, nil)
+						requestURL := fmt.Sprintf("http://localhost:8082//com_to_lesson")
+						form := url.Values{}
+						form.Add("jwt", request_jwt(update.Message.Chat.ID))
+						form.Add("num_of_lesson", num_of_lesson)
+						form.Add("group", group)
+						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 						response, _ := client.Do(request)
-						resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+						resBody, _ := io.ReadAll(response.Body)
 						msg.Text = string(resBody)
 					} else {
 						msg.Text = "Недостаточно прав"
@@ -258,10 +303,14 @@ func main() {
 							group = update.Message.Text
 						}
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8082//where_group?group=%s", group)
-						request, _ := http.NewRequest("GET", requestURL, nil)
+						requestURL := fmt.Sprintf("http://localhost:8082//where_group")
+						form := url.Values{}
+						form.Add("jwt", request_jwt(update.Message.Chat.ID))
+						form.Add("group", group)
+						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 						response, _ := client.Do(request)
-						resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+						resBody, _ := io.ReadAll(response.Body)
 						msg.Text = string(resBody)
 					} else {
 						msg.Text = "Недостаточно прав"
@@ -277,10 +326,14 @@ func main() {
 						teacher = update.Message.Text
 					}
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//where_teacher?teacher=%s", teacher)
-					request, _ := http.NewRequest("GET", requestURL, nil)
+					requestURL := fmt.Sprintf("http://localhost:8082//where_teacher")
+					form := url.Values{}
+					form.Add("jwt", request_jwt(update.Message.Chat.ID))
+					form.Add("teacher", teacher)
+					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					resBody, _ := io.ReadAll(response.Body)
 					msg.Text = string(resBody)
 				case "Изменить данные(ФИО, группа)":
 					msg.Text = "Отправте ваше ФИО (прим. Иванов Иван Иванович)"
