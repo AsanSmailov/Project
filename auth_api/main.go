@@ -11,11 +11,12 @@ func main() {
 	router := mux.NewRouter()
 
 	// Регистрируем маршруты
-	router.HandleFunc("/auth", users.Auth)           // Бот делает запрос, к нему прикладывает chat_id, затем бот получает ссылку.
-	router.HandleFunc("/oauth", users.Oauth_handler) //Это для гитхаба
-	router.HandleFunc("/checkAbout", users.CheckAbout)
-	router.HandleFunc("/sendAbout", users.SendAbout).Methods("POST")
-	router.HandleFunc("/getRole", users.GetRole)
+	router.HandleFunc("/auth", users.Auth)                                   //Формирование ссылки github
+	router.HandleFunc("/oauth", users.Oauth_handler)                         //github callback
+	router.HandleFunc("/checkAbout", users.CheckAbout)                       //Проверяет наличия имени или группы
+	router.HandleFunc("/sendAbout", users.SendAbout).Methods("POST")         //Изменение имени или группы
+	router.HandleFunc("/getRole", users.GetRole)                             //Отправка роли пользователя
+	router.HandleFunc("/getJWT/schedule", users.JWTschedule).Methods("POST") //Формирование jwt token для модуля Расписания
 
 	http.ListenAndServe(":8080", router)
 
