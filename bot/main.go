@@ -99,10 +99,14 @@ func main() {
 				tgbotapi.NewKeyboardButton("Где следующая пара"),
 				tgbotapi.NewKeyboardButton("Расписание на сегодня"),
 				tgbotapi.NewKeyboardButton("Расписание на завтра"),
+				tgbotapi.NewKeyboardButton("Расписание на дни недели"),
+				tgbotapi.NewKeyboardButton("Где преподаватель"),
 			),
 			tgbotapi.NewKeyboardButtonRow(
-				tgbotapi.NewKeyboardButton("Расписание на дни недели"),
+				tgbotapi.NewKeyboardButton("Оставить комментарий к паре"),
+				tgbotapi.NewKeyboardButton("Где группа"),
 				tgbotapi.NewKeyboardButton("toadmin"),
+				tgbotapi.NewKeyboardButton("Выйти"),
 			),
 		)
 		if !check(chatids, update.Message.Chat.ID) {
@@ -209,24 +213,88 @@ func main() {
 					msg.Text = "Выходной. В данный день пар нет."
 				case "Расписание на воскресенье":
 					msg.Text = "Выходной. В данный день пар нет."
-				case " ":
-					msg.Text = "..."
-				case "...":
+				case "Выйти":
+					delete(chatids, update.Message.Chat.ID)
+					msg.Text = "Вы успешно вышли!"
+				case "Оставить комментарий к паре":
 					if get_role(update.Message.Chat.ID) == "teacher" { //проверка роли для добавления коментария к паре
-						msg.Text = "..."
+						num_of_lesson := ""
+						msg.Text = "Введите номер пары"
+						bot.Send(msg)
+						for update := range updates {
+							if update.Message == nil { // ignore any non-Message Updates
+								continue
+							}
+							num_of_lesson = update.Message.Text
+						}
+						group := ""
+						msg.Text = "Введите номер группы"
+						bot.Send(msg)
+						for update := range updates {
+							if update.Message == nil { // ignore any non-Message Updates
+								continue
+							}
+							group = update.Message.Text
+						}
+						client := http.Client{}
+						requestURL := fmt.Sprintf("http://localhost:8082//com_to_lesson?num_of_lesson=%s&group=%s", num_of_lesson, group)
+						request, _ := http.NewRequest("GET", requestURL, nil)
+						response, _ := client.Do(request)
+						resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+						msg.Text = string(resBody)
 					} else {
 						msg.Text = "Недостаточно прав"
 					}
+				case "Где группа":
+					if get_role(update.Message.Chat.ID) == "teacher" { //проверка роли
+						group := ""
+						msg.Text = "Введите номер группы"
+						bot.Send(msg)
+						for update := range updates {
+							if update.Message == nil { // ignore any non-Message Updates
+								continue
+							}
+							group = update.Message.Text
+						}
+						client := http.Client{}
+						requestURL := fmt.Sprintf("http://localhost:8082//where_group?group=%s", group)
+						request, _ := http.NewRequest("GET", requestURL, nil)
+						response, _ := client.Do(request)
+						resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+						msg.Text = string(resBody)
+					} else {
+						msg.Text = "Недостаточно прав"
+					}
+				case "Где преподаватель":
+					teacher := ""
+					msg.Text = "Введите номер группы"
+					bot.Send(msg)
+					for update := range updates {
+						if update.Message == nil { // ignore any non-Message Updates
+							continue
+						}
+						teacher = update.Message.Text
+					}
+					client := http.Client{}
+					requestURL := fmt.Sprintf("http://localhost:8082//where_teacher?teacher=%s", teacher)
+					request, _ := http.NewRequest("GET", requestURL, nil)
+					response, _ := client.Do(request)
+					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+					msg.Text = string(resBody)
 				case "Назад":
 					msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
 						tgbotapi.NewKeyboardButtonRow(
 							tgbotapi.NewKeyboardButton("Где следующая пара"),
 							tgbotapi.NewKeyboardButton("Расписание на сегодня"),
 							tgbotapi.NewKeyboardButton("Расписание на завтра"),
+							tgbotapi.NewKeyboardButton("Расписание на дни недели"),
+							tgbotapi.NewKeyboardButton("Где преподаватель"),
 						),
 						tgbotapi.NewKeyboardButtonRow(
-							tgbotapi.NewKeyboardButton("Расписание на дни недели"),
+							tgbotapi.NewKeyboardButton("Оставить комментарий к паре"),
+							tgbotapi.NewKeyboardButton("Где группа"),
 							tgbotapi.NewKeyboardButton("toadmin"),
+							tgbotapi.NewKeyboardButton("Выйти"),
 						),
 					)
 				default:
