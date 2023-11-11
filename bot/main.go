@@ -103,6 +103,7 @@ func main() {
 				tgbotapi.NewKeyboardButton("Где преподаватель"),
 			),
 			tgbotapi.NewKeyboardButtonRow(
+				tgbotapi.NewKeyboardButton("Изменить данные(ФИО, группа)"),
 				tgbotapi.NewKeyboardButton("Оставить комментарий к паре"),
 				tgbotapi.NewKeyboardButton("Где группа"),
 				tgbotapi.NewKeyboardButton("toadmin"),
@@ -281,6 +282,38 @@ func main() {
 					response, _ := client.Do(request)
 					resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
 					msg.Text = string(resBody)
+				case "Изменить данные(ФИО, группа)":
+					msg.Text = "Отправте ваше ФИО (прим. Иванов Иван Иванович)"
+					bot.Send(msg)
+					for update := range updates {
+						if update.Message == nil { // ignore any non-Message Updates
+							continue
+						}
+						if send_data(update.Message.Chat.ID, update.Message.Text, "full_name") == "true" {
+							msg.Text = "Данные успешно записаны."
+							bot.Send(msg)
+							msg.Text = ""
+							break
+						} else {
+							msg.Text = "Ошибка! Не удалось записать данные."
+							bot.Send(msg)
+							msg.Text = ""
+						}
+					}
+					msg.Text = "Отправте вашу группу (прим. ИВТ-123(1), ПМИ-123(2), ПИ-123(1) и т.д)"
+					bot.Send(msg)
+					for update := range updates {
+						if send_data(update.Message.Chat.ID, update.Message.Text, "group") == "true" {
+							msg.Text = "Данные успешно записаны."
+							bot.Send(msg)
+							msg.Text = ""
+							break
+						} else {
+							msg.Text = "Ошибка! Не удалось записать данные."
+							bot.Send(msg)
+							msg.Text = ""
+						}
+					}
 				case "Назад":
 					msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
 						tgbotapi.NewKeyboardButtonRow(
@@ -291,6 +324,7 @@ func main() {
 							tgbotapi.NewKeyboardButton("Где преподаватель"),
 						),
 						tgbotapi.NewKeyboardButtonRow(
+							tgbotapi.NewKeyboardButton("Изменить данные(ФИО, группа)"),
 							tgbotapi.NewKeyboardButton("Оставить комментарий к паре"),
 							tgbotapi.NewKeyboardButton("Где группа"),
 							tgbotapi.NewKeyboardButton("toadmin"),
