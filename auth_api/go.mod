@@ -5,6 +5,7 @@ go 1.21.1
 require github.com/gorilla/mux v1.8.0
 
 require (
+	github.com/golang-jwt/jwt/v5 v5.1.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
