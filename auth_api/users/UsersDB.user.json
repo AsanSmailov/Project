@@ -12,18 +12,6 @@
 },
 {
   "_id": {
-    "$oid": "654a963eb96bbd365f7792a5"
-  },
-  "github_id": 144770548,
-  "tg_id": 1494367196,
-  "role": "student",
-  "about": {
-    "full_name": "",
-    "group": ""
-  }
-},
-{
-  "_id": {
     "$oid": "654a966cf09c5f7bab08a481"
   },
   "github_id": 144770548,
