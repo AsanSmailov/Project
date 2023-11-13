@@ -107,7 +107,7 @@ func GetRole(rw http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(rw, "%s", user.Role)
 }
 
-// Handle функция, принимает id и действие, возвращает сгенерированный jwt token
+// Handle функция, принимает id и действие, возвращает сгенерированный jwt token для расписания
 func JWTschedule(rw http.ResponseWriter, req *http.Request) {
 	//Получаем данные
 	github_id, _ := strconv.ParseInt(req.FormValue("gitid"), 10, 64)
@@ -132,6 +132,45 @@ func JWTschedule(rw http.ResponseWriter, req *http.Request) {
 	tokenExpiresAt := time.Now().Add(time.Second * time.Duration(60))
 	payload := jwt.MapClaims{
 		"action":     action,
+		"full_name":  user.About.FullName,
+		"group":      user.About.Group,
+		"expires_at": tokenExpiresAt,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+	//Подписываем токен секретным кодом
+	tokenString, err := token.SignedString([]byte(SECRET))
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Fprintf(rw, "%s", tokenString)
+}
+
+func JWTadmin(rw http.ResponseWriter, req *http.Request) {
+	//Получаем данные
+	github_id, _ := strconv.ParseInt(req.FormValue("gitid"), 10, 64)
+	action := string(req.FormValue("action"))
+	//Генерируем секрет
+	SECRET := randJWTSecret(16)
+
+	//Отправляем секретный код модулю расписания
+	client := http.Client{}
+	requesturl := "http://localhost:8083/getSecret"
+
+	form := url.Values{}
+	form.Add("SECRET", SECRET)
+	request, _ := http.NewRequest("POST", requesturl, strings.NewReader(form.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response, _ := client.Do(request)
+	defer response.Body.Close()
+
+	//Получаем данные
+	user := getData(github_id, "github_id")
+	//Формируем токен
+	tokenExpiresAt := time.Now().Add(time.Second * time.Duration(60))
+	payload := jwt.MapClaims{
+		"action":     action,
+		"githubID":   user.GithubID,
+		"tgID":       user.TgId,
 		"full_name":  user.About.FullName,
 		"group":      user.About.Group,
 		"expires_at": tokenExpiresAt,
