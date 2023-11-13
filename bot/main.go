@@ -69,10 +69,26 @@ func send_data(Chat_ID int64, message string, datatype string) string {
 // POST запрос к авторизации для ПОЛУЧЕНИЯ JWT TOKEN
 func request_jwt(GIT_ID string) string {
 	client := http.Client{}
-	requestURL := "http://localhost:8080/sendAbout"
+	requestURL := "http://localhost:8080/getJWT/schedule"
 
 	form := url.Values{}
 	form.Add("gitid", GIT_ID)
+
+	request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	response, _ := client.Do(request)
+	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+	defer response.Body.Close()
+	return string(resBody)
+}
+
+func request_jwt_admin(GIT_ID string) string {
+	client := http.Client{}
+	requestURL := "http://localhost:8080/getJWT/admin"
+
+	form := url.Values{}
+	form.Add("github_id", GIT_ID)
 
 	request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -166,7 +182,7 @@ func main() {
 						client := http.Client{}
 						requestURL := fmt.Sprintf("http://localhost:8082//toadmin")
 						form := url.Values{}
-						form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
+						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
 						form.Add("gitig", chatids[update.Message.Chat.ID])
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
