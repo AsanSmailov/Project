@@ -88,7 +88,7 @@ func CheckAbout(rw http.ResponseWriter, req *http.Request) {
 }
 
 // Handle функция, принимает id, информацию, которую надо изменить, тип информации, возвращает bool
-func SendAbout(rw http.ResponseWriter, req *http.Request) {
+func UpdateData(rw http.ResponseWriter, req *http.Request) {
 	//Получаем данные
 	tg_id, _ := strconv.ParseInt(req.FormValue("chatid"), 10, 64)
 	data := req.FormValue("data")
@@ -128,12 +128,18 @@ func JWTschedule(rw http.ResponseWriter, req *http.Request) {
 
 	//Получаем данные
 	user := getData(github_id, "github_id")
+	line := user.About.Group
+	var group, sub_group string
+	group = line[:strings.Index(line, "(")]
+	sub_group = line[strings.Index(line, "(")+1 : strings.Index(line, ")")]
+	log.Print(group, " ", sub_group)
 	//Формируем токен
 	tokenExpiresAt := time.Now().Add(time.Second * time.Duration(60))
 	payload := jwt.MapClaims{
 		"action":     action,
 		"full_name":  user.About.FullName,
-		"group":      user.About.Group,
+		"group":      group,
+		"sub_group":  sub_group,
 		"expires_at": tokenExpiresAt,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
@@ -142,6 +148,7 @@ func JWTschedule(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Print(SECRET)
 	fmt.Fprintf(rw, "%s", tokenString)
 }
 
@@ -152,7 +159,7 @@ func JWTadmin(rw http.ResponseWriter, req *http.Request) {
 	//Генерируем секрет
 	SECRET := randJWTSecret(16)
 
-	//Отправляем секретный код модулю расписания
+	//Отправляем секретный код модулю администрирования
 	client := http.Client{}
 	requesturl := "http://localhost:8083/getSecret"
 
@@ -167,6 +174,7 @@ func JWTadmin(rw http.ResponseWriter, req *http.Request) {
 	user := getData(github_id, "github_id")
 	//Формируем токен
 	tokenExpiresAt := time.Now().Add(time.Second * time.Duration(60))
+
 	payload := jwt.MapClaims{
 		"action":     action,
 		"githubID":   user.GithubID,
@@ -194,6 +202,19 @@ func randJWTSecret(n int) string {
 		b[i] = charset[rand.Intn(len(charset))]
 	}
 	return string(b)
+}
+
+func GetAllUsers(rw http.ResponseWriter, req *http.Request) {
+	users, err := json.Marshal(giveAllUsers())
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Fprintf(rw, "%s", users)
+}
+
+func DeleteUser(rw http.ResponseWriter, req *http.Request) {
+	github_id, _ := strconv.ParseInt(req.FormValue("gitid"), 10, 64)
+	fmt.Fprintf(rw, "%t", del_user(github_id, "github_id"))
 }
 
 // Для Oauth_handler
