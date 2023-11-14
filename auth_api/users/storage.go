@@ -10,15 +10,15 @@ import (
 )
 
 type About struct {
-	FullName string `bson:"full_name"`
-	Group    string `bson:"group"`
+	FullName string `bson:"full_name" json:"full_name"`
+	Group    string `bson:"group" json:"group"`
 }
 
 type User struct {
-	GithubID int64  `bson:"github_id"`
-	TgId     int64  `bson:"tg_id"`
-	Role     string `bson:"role"`
-	About    About  `bson:"about"`
+	GithubID int64  `bson:"github_id" json:"github_id"`
+	TgId     int64  `bson:"tg_id" json:"tg_id"`
+	Role     string `bson:"role" json:"role"`
+	About    About  `bson:"about" json:"about"`
 }
 
 // Функция, проверяет наличие документа с github и tg id
@@ -115,6 +115,51 @@ func inputData(tgID int64, data string, datatype string) bool {
 	_, err1 := collection.UpdateOne(context.TODO(), filter, replacement)
 	if err1 != nil {
 		err1 = client.Disconnect(context.TODO())
+		return false
+	} else {
+		err = client.Disconnect(context.TODO())
+		return true
+	}
+}
+
+func giveAllUsers() []User {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	err = client.Connect(context.TODO())
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	collection := client.Database("UsersDB").Collection("user")
+
+	filter := bson.D{}
+
+	cursor, err1 := collection.Find(context.TODO(), filter)
+	if err1 != nil {
+		log.Fatal(err)
+	}
+	var results []User
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		log.Fatal(err)
+	}
+	err = client.Disconnect(context.TODO())
+	return results
+}
+
+func del_user(id int64, idtype string) bool {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	err = client.Connect(context.TODO())
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	collection := client.Database("UsersDB").Collection("user")
+
+	filter := bson.D{{idtype, id}}
+	_, err = collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		err = client.Disconnect(context.TODO())
 		return false
 	} else {
 		err = client.Disconnect(context.TODO())
