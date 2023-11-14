@@ -50,7 +50,7 @@ func check_data(Chat_ID int64) string {
 // GET запрос к авторизации для добовленния данных
 func send_data(Chat_ID int64, message string, datatype string) string {
 	client := http.Client{}
-	requestURL := "http://localhost:8080/sendAbout"
+	requestURL := "http://localhost:8080/updateData"
 
 	form := url.Values{}
 	form.Add("chatid", strconv.FormatInt(Chat_ID, 10)) //chat id пользователя которому нужно записать данные
