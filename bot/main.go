@@ -211,11 +211,11 @@ func main() {
 						msg.Text = "Недостаточно прав"
 					}
 				case "Где следующая пара":
-					getSchedule(chatids, update.Message.Chat.ID, "next_lesson")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "next_lesson")
 				case "Расписание на сегодня":
-					getSchedule(chatids, update.Message.Chat.ID, "today_lessons")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "today_lessons")
 				case "Расписание на завтра":
-					getSchedule(chatids, update.Message.Chat.ID, "tomorrow_lessons")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "tomorrow_lessons")
 				case "Расписание на дни недели":
 					newKeyboard := tgbotapi.NewMessage(update.Message.Chat.ID, "Выберите день недели:")
 					newKeyboard.ReplyMarkup = tgbotapi.NewReplyKeyboard(
@@ -234,15 +234,15 @@ func main() {
 					)
 					bot.Send(newKeyboard)
 				case "Расписание на понедельник":
-					getSchedule(chatids, update.Message.Chat.ID, "monday_lessons")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "monday_lessons")
 				case "Расписание на вторник":
-					getSchedule(chatids, update.Message.Chat.ID, "tuesday_lessons")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "tuesday_lessons")
 				case "Расписание на среду":
-					getSchedule(chatids, update.Message.Chat.ID, "wednsday_lessons")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "wednsday_lessons")
 				case "Расписание на четверг":
-					getSchedule(chatids, update.Message.Chat.ID, "thursday_lessons")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "thursday_lessons")
 				case "Расписание на пятницу":
-					getSchedule(chatids, update.Message.Chat.ID, "friday_lessons")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "friday_lessons")
 				case "Расписание на субботу":
 					msg.Text = "Выходной. В данный день пар нет."
 				case "Расписание на воскресенье":
