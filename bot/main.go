@@ -50,7 +50,7 @@ func check_data(Chat_ID int64) string {
 // GET запрос к авторизации для добовленния данных
 func send_data(Chat_ID int64, message string, datatype string) string {
 	client := http.Client{}
-	requestURL := "http://localhost:8080/updateData"
+	requestURL := "http://localhost:8080/sendAbout"
 
 	form := url.Values{}
 	form.Add("chatid", strconv.FormatInt(Chat_ID, 10)) //chat id пользователя которому нужно записать данные
@@ -95,6 +95,23 @@ func request_jwt_admin(GIT_ID string) string {
 
 	response, _ := client.Do(request)
 	resBody, _ := io.ReadAll(response.Body) // Получаем тело ответ
+	defer response.Body.Close()
+	return string(resBody)
+}
+
+func getSchedule(chatids map[int64]string, Chat_ID int64, action string) string {
+	client := http.Client{}
+	requestURL := fmt.Sprintf("http://localhost:8082//getSchedule")
+
+	form := url.Values{}
+	form.Add("jwt", request_jwt(chatids[Chat_ID]))
+	form.Add("action", action)
+
+	request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	response, _ := client.Do(request)
+	resBody, _ := io.ReadAll(response.Body)
 	defer response.Body.Close()
 	return string(resBody)
 }
@@ -180,7 +197,7 @@ func main() {
 				case "toadmin":
 					if get_role(update.Message.Chat.ID) == "admin" { //Проверка роли для перехода в админ панель
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8082//toadmin")
+						requestURL := fmt.Sprintf("http://localhost:8083//toadmin")
 						form := url.Values{}
 						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
 						form.Add("gitig", chatids[update.Message.Chat.ID])
@@ -194,38 +211,11 @@ func main() {
 						msg.Text = "Недостаточно прав"
 					}
 				case "Где следующая пара":
-					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//next_lesson")
-					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
-					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
-					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body)
-					msg.Text = string(resBody)
-					defer response.Body.Close()
+					getSchedule(chatids, update.Message.Chat.ID, "next_lesson")
 				case "Расписание на сегодня":
-					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//today_lessons")
-					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
-					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
-					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body)
-					msg.Text = string(resBody)
-					defer response.Body.Close()
+					getSchedule(chatids, update.Message.Chat.ID, "today_lessons")
 				case "Расписание на завтра":
-					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//tomorrow_lessons")
-					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
-					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
-					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body)
-					msg.Text = string(resBody)
-					defer response.Body.Close()
+					getSchedule(chatids, update.Message.Chat.ID, "tomorrow_lessons")
 				case "Расписание на дни недели":
 					newKeyboard := tgbotapi.NewMessage(update.Message.Chat.ID, "Выберите день недели:")
 					newKeyboard.ReplyMarkup = tgbotapi.NewReplyKeyboard(
@@ -244,60 +234,15 @@ func main() {
 					)
 					bot.Send(newKeyboard)
 				case "Расписание на понедельник":
-					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//monday_lessons")
-					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
-					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
-					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body)
-					msg.Text = string(resBody)
-					defer response.Body.Close()
+					getSchedule(chatids, update.Message.Chat.ID, "monday_lessons")
 				case "Расписание на вторник":
-					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//tuesday_lessons")
-					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
-					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
-					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body)
-					msg.Text = string(resBody)
-					defer response.Body.Close()
+					getSchedule(chatids, update.Message.Chat.ID, "tuesday_lessons")
 				case "Расписание на среду":
-					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//wednsday_lessons")
-					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
-					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
-					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body)
-					msg.Text = string(resBody)
-					defer response.Body.Close()
+					getSchedule(chatids, update.Message.Chat.ID, "wednsday_lessons")
 				case "Расписание на четверг":
-					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//thursday_lessons")
-					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
-					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
-					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body)
-					msg.Text = string(resBody)
-					defer response.Body.Close()
+					getSchedule(chatids, update.Message.Chat.ID, "thursday_lessons")
 				case "Расписание на пятницу":
-					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//friday_lessons")
-					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
-					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
-					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					response, _ := client.Do(request)
-					resBody, _ := io.ReadAll(response.Body)
-					msg.Text = string(resBody)
-					defer response.Body.Close()
+					getSchedule(chatids, update.Message.Chat.ID, "friday_lessons")
 				case "Расписание на субботу":
 					msg.Text = "Выходной. В данный день пар нет."
 				case "Расписание на воскресенье":
