@@ -312,7 +312,7 @@ func main() {
 					}
 				case "Где преподаватель":
 					teacher := ""
-					msg.Text = "Введите номер группы"
+					msg.Text = "Введите ФИО преподавателя"
 					bot.Send(msg)
 					for update := range updates {
 						if update.Message == nil { // ignore any non-Message Updates
