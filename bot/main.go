@@ -67,12 +67,13 @@ func send_data(Chat_ID int64, message string, datatype string) string {
 }
 
 // POST запрос к авторизации для ПОЛУЧЕНИЯ JWT TOKEN
-func request_jwt(GIT_ID string) string {
+func request_jwt(GIT_ID string, action string) string {
 	client := http.Client{}
 	requestURL := "http://localhost:8080/getJWT/schedule"
 
 	form := url.Values{}
 	form.Add("gitid", GIT_ID)
+	form.Add("action", action)
 
 	request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -101,11 +102,10 @@ func request_jwt_admin(GIT_ID string) string {
 
 func getSchedule(chatids map[int64]string, Chat_ID int64, action string) string {
 	client := http.Client{}
-	requestURL := fmt.Sprintf("http://localhost:8082//getSchedule")
+	requestURL := fmt.Sprintf("http://localhost:8082/getSchedule")
 
 	form := url.Values{}
-	form.Add("jwt", request_jwt(chatids[Chat_ID]))
-	form.Add("action", action)
+	form.Add("jwt", request_jwt(chatids[Chat_ID], action))
 
 	request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -238,7 +238,7 @@ func main() {
 				case "Расписание на вторник":
 					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "tuesday_lessons")
 				case "Расписание на среду":
-					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "wednsday_lessons")
+					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "wednesday_lessons")
 				case "Расписание на четверг":
 					msg.Text = getSchedule(chatids, update.Message.Chat.ID, "thursday_lessons")
 				case "Расписание на пятницу":
@@ -252,7 +252,7 @@ func main() {
 					msg.Text = "Вы успешно вышли!"
 				case "Оставить комментарий к паре":
 					if get_role(update.Message.Chat.ID) == "teacher" { //проверка роли для добавления коментария к паре
-						num_of_lesson := ""
+						var num_of_lesson, group, comment string
 						msg.Text = "Введите номер пары"
 						bot.Send(msg)
 						for update := range updates {
@@ -260,22 +260,35 @@ func main() {
 								continue
 							}
 							num_of_lesson = update.Message.Text
+							break
 						}
-						group := ""
-						msg.Text = "Введите номер группы"
+
+						msg.Text = "Введите номер подгруппы"
 						bot.Send(msg)
 						for update := range updates {
 							if update.Message == nil { // ignore any non-Message Updates
 								continue
 							}
 							group = update.Message.Text
+							break
+						}
+
+						msg.Text = "Введите комментарий"
+						bot.Send(msg)
+						for update := range updates {
+							if update.Message == nil { // ignore any non-Message Updates
+								continue
+							}
+							comment = update.Message.Text
+							break
 						}
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8082//com_to_lesson")
+						requestURL := fmt.Sprintf("http://localhost:8082/com_to_lesson")
 						form := url.Values{}
-						form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
+						form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID], "com_to_lesson"))
 						form.Add("num_of_lesson", num_of_lesson)
 						form.Add("group", group)
+						form.Add("comment", comment)
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 						response, _ := client.Do(request)
@@ -288,18 +301,19 @@ func main() {
 				case "Где группа":
 					if get_role(update.Message.Chat.ID) == "teacher" { //проверка роли
 						group := ""
-						msg.Text = "Введите номер группы"
+						msg.Text = "Введите номер подгруппы"
 						bot.Send(msg)
 						for update := range updates {
 							if update.Message == nil { // ignore any non-Message Updates
 								continue
 							}
 							group = update.Message.Text
+							break
 						}
 						client := http.Client{}
 						requestURL := fmt.Sprintf("http://localhost:8082//where_group")
 						form := url.Values{}
-						form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
+						form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID], "where_group"))
 						form.Add("group", group)
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -312,18 +326,19 @@ func main() {
 					}
 				case "Где преподаватель":
 					teacher := ""
-					msg.Text = "Введите ФИО преподавателя"
+					msg.Text = "Введите ФИО преподавателя (прим. Иванов И. И.)"
 					bot.Send(msg)
 					for update := range updates {
 						if update.Message == nil { // ignore any non-Message Updates
 							continue
 						}
 						teacher = update.Message.Text
+						break
 					}
 					client := http.Client{}
-					requestURL := fmt.Sprintf("http://localhost:8082//where_teacher")
+					requestURL := fmt.Sprintf("http://localhost:8082/where_teacher")
 					form := url.Values{}
-					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID]))
+					form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID], "where_teacher"))
 					form.Add("teacher", teacher)
 					request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
