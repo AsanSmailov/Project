@@ -311,7 +311,7 @@ func main() {
 							break
 						}
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8082//where_group")
+						requestURL := fmt.Sprintf("http://localhost:8082/where_group")
 						form := url.Values{}
 						form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID], "where_group"))
 						form.Add("group", group)
