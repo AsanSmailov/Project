@@ -161,15 +161,17 @@ func where_teacher(w http.ResponseWriter, r *http.Request) {
 		t_m, _ := strconv.Atoi(t[14:16])
 		result := find_day(today, sub, W)
 		if (t_h == 8 || (t_h == 9 && t_m < 50)) && (teacher == result.Lesson1.Teacher) {
-			fmt.Print(result.Lesson1.Classroom)
+			fmt.Fprintf(w, "%s", result.Lesson1.Classroom)
 		} else if ((t_h == 9 && t_m >= 50) || (t_h == 10) || (t_h == 11 && t_m < 30)) && (teacher == result.Lesson2.Teacher) {
-			fmt.Print(result.Lesson2.Classroom)
+			fmt.Fprintf(w, "%s", result.Lesson2.Classroom)
 		} else if ((t_h == 11 && t_m >= 30) || (t_h == 12) || (t_h == 13 && t_m < 20)) && (teacher == result.Lesson3.Teacher) {
-			fmt.Print(result.Lesson3.Classroom)
+			fmt.Fprintf(w, "%s", result.Lesson3.Classroom)
 		} else if ((t_h == 13 && t_m >= 20) || (t_h == 14 && t_m < 50)) && (teacher == result.Lesson4.Teacher) {
-			fmt.Print(result.Lesson4.Classroom)
+			fmt.Fprintf(w, "%s", result.Lesson4.Classroom)
 		} else if ((t_h == 15) || (t_h == 16 && t_m < 30)) && (teacher == result.Lesson5.Teacher) {
-			fmt.Print(result.Lesson5.Classroom)
+			fmt.Fprintf(w, "%s", result.Lesson5.Classroom)
+		} else {
+			fmt.Fprintf(w, "%s", "У преподавателя нет пары!")
 		}
 	}
 }
@@ -332,17 +334,18 @@ func act(action string, sub int) string {
 		t_h, _ := strconv.Atoi(t[11:13])
 		t_m, _ := strconv.Atoi(t[14:16])
 		result := find_day(today, sub, W)
-		if t_h == 8 || (t_h == 9 && t_m < 50) {
-			fmt.Print(result.Lesson1.Classroom)
-		} else if (t_h == 9 && t_m >= 50) || (t_h == 10) || (t_h == 11 && t_m < 30) {
-			fmt.Print(result.Lesson2.Classroom)
-		} else if (t_h == 11 && t_m >= 30) || (t_h == 12) || (t_h == 13 && t_m < 20) {
-			fmt.Print(result.Lesson3.Classroom)
-		} else if (t_h == 13 && t_m >= 20) || (t_h == 14 && t_m < 50) {
-			fmt.Print(result.Lesson4.Classroom)
-		} else if (t_h == 15) || (t_h == 16 && t_m < 30) {
-			fmt.Print(result.Lesson5.Classroom)
+		if (t_h == 8 || (t_h == 9 && t_m < 50)) && result.Lesson1.Classroom != "" {
+			return result.Lesson1.Classroom
+		} else if ((t_h == 9 && t_m >= 50) || (t_h == 10) || (t_h == 11 && t_m < 30)) && result.Lesson2.Classroom != "" {
+			return result.Lesson2.Classroom
+		} else if ((t_h == 11 && t_m >= 30) || (t_h == 12) || (t_h == 13 && t_m < 20)) && result.Lesson3.Classroom != "" {
+			return result.Lesson3.Classroom
+		} else if ((t_h == 13 && t_m >= 20) || (t_h == 14 && t_m < 50)) && result.Lesson4.Classroom != "" {
+			return result.Lesson4.Classroom
+		} else if ((t_h == 15) || (t_h == 16 && t_m < 30)) && result.Lesson5.Classroom != "" {
+			return result.Lesson5.Classroom
 		}
+		return "У подгруппы нет пары!"
 	}
 	return ""
 }
