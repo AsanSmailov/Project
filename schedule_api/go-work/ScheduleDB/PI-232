@@ -1,0 +1,880 @@
+{
+  "_id": {
+    "$oid": "655e36b36f57447b0a19ecb7"
+  },
+  "day": "Понедельник",
+  "week": "нечетная",
+  "count_of_lessons": 3,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "Математика",
+    "time": "08:00",
+    "type": "лекция",
+    "classroom": "211А",
+    "teacher": "Смирнова С. И."
+  },
+  "lesson2": {
+    "name": "Математика",
+    "time": "09:50",
+    "type": "практика",
+    "classroom": "211А",
+    "teacher": "Смирнова С. И."
+  },
+  "lesson3": {
+    "name": "Основы российской государственности",
+    "time": "11:30",
+    "type": "практика",
+    "classroom": "306В",
+    "teacher": "Клименко Е. П."
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e36b96f57447b0a19ecb8"
+  },
+  "day": "Понедельник",
+  "week": "нечетная",
+  "count_of_lessons": 3,
+  "subgroup": 2,
+  "lesson1": {
+    "name": "Математика",
+    "time": "08:00",
+    "type": "лекция",
+    "classroom": "211А",
+    "teacher": "Смирнова С. И."
+  },
+  "lesson2": {
+    "name": "Математика",
+    "time": "09:50",
+    "type": "практика",
+    "classroom": "211А",
+    "teacher": "Смирнова С. И."
+  },
+  "lesson3": {
+    "name": "Основы российской государственности",
+    "time": "11:30",
+    "type": "практика",
+    "classroom": "306В",
+    "teacher": "Клименко Е. П."
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e36d86f57447b0a19ecb9"
+  },
+  "day": "Понедельник",
+  "week": "четная",
+  "count_of_lessons": 3,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "Математика",
+    "time": "08:00",
+    "type": "лекция",
+    "classroom": "211А",
+    "teacher": "Смирнова С. И."
+  },
+  "lesson2": {
+    "name": "Математика",
+    "time": "09:50",
+    "type": "практика",
+    "classroom": "211А",
+    "teacher": "Смирнова С. И."
+  },
+  "lesson3": {
+    "name": "Основы российской государственности",
+    "time": "11:30",
+    "type": "практика",
+    "classroom": "306В",
+    "teacher": "Клименко Е. П."
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e36df6f57447b0a19ecba"
+  },
+  "day": "Понедельник",
+  "week": "четная",
+  "count_of_lessons": 3,
+  "subgroup": 2,
+  "lesson1": {
+    "name": "Математика",
+    "time": "08:00",
+    "type": "лекция",
+    "classroom": "211А",
+    "teacher": "Смирнова С. И."
+  },
+  "lesson2": {
+    "name": "Математика",
+    "time": "09:50",
+    "type": "практика",
+    "classroom": "211А",
+    "teacher": "Смирнова С. И."
+  },
+  "lesson3": {
+    "name": "Основы российской государственности",
+    "time": "11:30",
+    "type": "практика",
+    "classroom": "306В",
+    "teacher": "Клименко Е. П."
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e37b56f57447b0a19ecbe"
+  },
+  "day": "Вторник",
+  "week": "нечетная",
+  "count_of_lessons": 4,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "Основы цифровой грамотности",
+    "time": "8:00",
+    "type": "практика",
+    "classroom": "119А",
+    "teacher": "Корниенко А. Ю"
+  },
+  "lesson2": {
+    "name": "Алгоритмизация и программирование",
+    "time": "9:50",
+    "type": "практика",
+    "classroom": "117А",
+    "teacher": "Зойкин Е. С."
+  },
+  "lesson3": {
+    "name": "История России",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "209А",
+    "teacher": "Непомнящий А. А."
+  },
+  "lesson4": {
+    "name": "Иностранный язык",
+    "time": "13:20",
+    "type": "практика",
+    "classroom": "525Б",
+    "teacher": "Мельниченко Т. В."
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e37fc6f57447b0a19ecbf"
+  },
+  "day": "Вторник",
+  "week": "нечетная",
+  "count_of_lessons": 2,
+  "subgroup": 2,
+  "lesson15": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "Основы цифровой грамотности",
+    "time": "09:50",
+    "type": "практика",
+    "classroom": "9А",
+    "teacher": "Корниенко А. Ю"
+  },
+  "lesson3": {
+    "name": "История России",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "209А",
+    "teacher": "Непомнящий А. А."
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e382f6f57447b0a19ecc0"
+  },
+  "day": "Вторник",
+  "week": "четная",
+  "count_of_lessons": 3,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "Основы цифровой грамотности",
+    "time": "8:00",
+    "type": "практика",
+    "classroom": "119А",
+    "teacher": "Корниенко А. Ю"
+  },
+  "lesson2": {
+    "name": "Алгоритмизация и программирование",
+    "time": "9:50",
+    "type": "практика",
+    "classroom": "117А",
+    "teacher": "Зойкин Е. С."
+  },
+  "lesson3": {
+    "name": "История России",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "209А",
+    "teacher": "Непомнящий А. А."
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e38356f57447b0a19ecc1"
+  },
+  "day": "Вторник",
+  "week": "четная",
+  "count_of_lessons": 2,
+  "subgroup": 2,
+  "lesson15": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "Основы цифровой грамотности",
+    "time": "09:50",
+    "type": "практика",
+    "classroom": "9А",
+    "teacher": "Корниенко А. Ю"
+  },
+  "lesson3": {
+    "name": "История России",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "209А",
+    "teacher": "Непомнящий А. А."
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e38756f57447b0a19ecc5"
+  },
+  "day": "Среда",
+  "week": "нечетная",
+  "count_of_lessons": 3,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson3": {
+    "name": "Алгоритмизация и программирование",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Чабанов В. В."
+  },
+  "lesson4": {
+    "name": "Основы российской государственности",
+    "time": "13:20",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Клименко Е. П."
+  },
+  "lesson5": {
+    "name": "Физическая культура",
+    "time": "15:00",
+    "type": "практика",
+    "classroom": "спорт зал ТА",
+    "teacher": "Блонская Л. Л."
+  }
+}
+{
+  "_id": {
+    "$oid": "655e387b6f57447b0a19ecc6"
+  },
+  "day": "Среда",
+  "week": "нечетная",
+  "count_of_lessons": 3,
+  "subgroup": 2,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson3": {
+    "name": "Алгоритмизация и программирование",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Чабанов В. В."
+  },
+  "lesson4": {
+    "name": "Основы российской государственности",
+    "time": "13:20",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Клименко Е. П."
+  },
+  "lesson5": {
+    "name": "Физическая культура",
+    "time": "15:00",
+    "type": "практика",
+    "classroom": "спорт зал ТА",
+    "teacher": "Блонская Л. Л."
+  }
+}
+{
+  "_id": {
+    "$oid": "655e38d56f57447b0a19ecc7"
+  },
+  "day": "Среда",
+  "week": "четная",
+  "count_of_lessons": 3,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson3": {
+    "name": "Алгоритмизация и программирование",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Чабанов В. В."
+  },
+  "lesson4": {
+    "name": "Структуры и алгоритмы обработки данных",
+    "time": "13:20",
+    "type": "практика",
+    "classroom": "315А",
+    "teacher": "Горская И. Ю."
+  },
+  "lesson5": {
+    "name": "Физическая культура",
+    "time": "15:00",
+    "type": "практика",
+    "classroom": "спорт зал ТА",
+    "teacher": "Блонская Л. Л."
+  }
+}
+{
+  "_id": {
+    "$oid": "655e395a6f57447b0a19ecc8"
+  },
+  "day": "Среда",
+  "week": "четная",
+  "count_of_lessons": 4,
+  "subgroup": 2,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "Алгоритмизация и программирование",
+    "time": "9:50",
+    "type": "практика",
+    "classroom": "224А",
+    "teacher": "Завьялов И. В."
+  },
+  "lesson3": {
+    "name": "Алгоритмизация и программирование",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Чабанов В. В."
+  },
+  "lesson4": {
+    "name": "Структуры и алгоритмы обработки данных",
+    "time": "13:20",
+    "type": "практика",
+    "classroom": "315А",
+    "teacher": "Горская И. Ю."
+  },
+  "lesson5": {
+    "name": "Физическая культура",
+    "time": "15:00",
+    "type": "практика",
+    "classroom": "спорт зал ТА",
+    "teacher": "Блонская Л. Л."
+  }
+}
+{
+  "_id": {
+    "$oid": "655e39886f57447b0a19eccc"
+  },
+  "day": "Четверг",
+  "week": "нечетная",
+  "count_of_lessons": 3,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "Основы цифровой грамотности",
+    "time": "9:50",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Корниенко А. Ю."
+  },
+  "lesson3": {
+    "name": "Деловая коммуникация и русская речевая культура",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Рудницкая Л. И."
+  },
+  "lesson4": {
+    "name": "Структуры и алгоритмы обработки данных",
+    "time": "13:20",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Горская И. Ю."
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e39f36f57447b0a19eccd"
+  },
+  "day": "Четверг",
+  "week": "нечетная",
+  "count_of_lessons": 4,
+  "subgroup": 2,
+  "lesson1": {
+    "name": "Иностранный язвк",
+    "time": "8:00",
+    "type": "практика",
+    "classroom": "409В",
+    "teacher": "Скляренко"
+  },
+  "lesson2": {
+    "name": "Основы цифровой грамотности",
+    "time": "9:50",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Корниенко А. Ю."
+  },
+  "lesson3": {
+    "name": "Деловая коммуникация и русская речевая культура",
+    "time": "11:30",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Рудницкая Л. И."
+  },
+  "lesson4": {
+    "name": "Структуры и алгоритмы обработки данных",
+    "time": "13:20",
+    "type": "лекция",
+    "classroom": "302А",
+    "teacher": "Горская И. Ю."
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e3aa16f57447b0a19ecd1"
+  },
+  "day": "Четверг",
+  "week": "четная",
+  "count_of_lessons": 2,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "Деловая коммуникация и русская речевая культура",
+    "time": "09:50",
+    "type": "практика",
+    "classroom": "309А",
+    "teacher": "Рудницкая Л. И."
+  },
+  "lesson3": {
+    "name": "Иностранный язык",
+    "time": "11:30",
+    "type": "практика",
+    "classroom": "515Б",
+    "teacher": "Мельниченко Т. В."
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e3adb6f57447b0a19ecd2"
+  },
+  "day": "Четверг",
+  "week": "четная",
+  "count_of_lessons": 2,
+  "subgroup": 2,
+  "lesson1": {
+    "name": "Иностранный язык",
+    "time": "8:00",
+    "type": "практика",
+    "classroom": "409А",
+    "teacher": "Скляренко"
+  },
+  "lesson2": {
+    "name": "Деловая коммуникация и русская речевая культура",
+    "time": "09:50",
+    "type": "практика",
+    "classroom": "309А",
+    "teacher": "Рудницкая Л. И."
+  },
+  "lesson3": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson4": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "6558c6843d0e56193604ec5f"
+  },
+  "day": "Пятница",
+  "week": "нечетная",
+  "count_of_lessons": 1,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson3": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson4": {
+    "name": "История России",
+    "time": "13:20",
+    "type": "практика",
+    "classroom": "209А",
+    "teacher": "Лейбенсон Ю. Т."
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e3b526f57447b0a19ecd6"
+  },
+  "day": "Пятница",
+  "week": "нечетная",
+  "count_of_lessons": 1,
+  "subgroup": 2,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson3": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson4": {
+    "name": "История России",
+    "time": "13:20",
+    "type": "практика",
+    "classroom": "209А",
+    "teacher": "Лейбенсон Ю. Т."
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e3b596f57447b0a19ecd7"
+  },
+  "day": "Пятница",
+  "week": "четная",
+  "count_of_lessons": 1,
+  "subgroup": 1,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson3": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson4": {
+    "name": "История России",
+    "time": "13:20",
+    "type": "практика",
+    "classroom": "209А",
+    "teacher": "Лейбенсон Ю. Т."
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
+{
+  "_id": {
+    "$oid": "655e3b626f57447b0a19ecd8"
+  },
+  "day": "Пятница",
+  "week": "четная",
+  "count_of_lessons": 1,
+  "subgroup": 2,
+  "lesson1": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson2": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson3": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  },
+  "lesson4": {
+    "name": "История России",
+    "time": "13:20",
+    "type": "практика",
+    "classroom": "209А",
+    "teacher": "Лейбенсон Ю. Т."
+  },
+  "lesson5": {
+    "name": "",
+    "time": "",
+    "type": "",
+    "classroom": "",
+    "teacher": ""
+  }
+}
