@@ -263,13 +263,24 @@ func main() {
 							break
 						}
 
-						msg.Text = "Введите номер подгруппы"
+						msg.Text = "Введите номер группы (Например ПИ-232)"
 						bot.Send(msg)
 						for update := range updates {
 							if update.Message == nil { // ignore any non-Message Updates
 								continue
 							}
 							group = update.Message.Text
+							break
+						}
+
+						subgroup := ""
+						msg.Text = "Введите номер подгруппы (1 или 2)"
+						bot.Send(msg)
+						for update := range updates {
+							if update.Message == nil { // ignore any non-Message Updates
+								continue
+							}
+							subgroup = update.Message.Text
 							break
 						}
 
@@ -288,6 +299,7 @@ func main() {
 						form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID], "com_to_lesson"))
 						form.Add("num_of_lesson", num_of_lesson)
 						form.Add("group", group)
+						form.Add("subgroup", subgroup)
 						form.Add("comment", comment)
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -301,7 +313,7 @@ func main() {
 				case "Где группа":
 					if get_role(update.Message.Chat.ID) == "teacher" { //проверка роли
 						group := ""
-						msg.Text = "Введите номер подгруппы"
+						msg.Text = "Введите номер группы (Например ПИ-232)"
 						bot.Send(msg)
 						for update := range updates {
 							if update.Message == nil { // ignore any non-Message Updates
@@ -310,11 +322,22 @@ func main() {
 							group = update.Message.Text
 							break
 						}
+						subgroup := ""
+						msg.Text = "Введите номер подгруппы (1 или 2)"
+						bot.Send(msg)
+						for update := range updates {
+							if update.Message == nil { // ignore any non-Message Updates
+								continue
+							}
+							subgroup = update.Message.Text
+							break
+						}
 						client := http.Client{}
 						requestURL := fmt.Sprintf("http://localhost:8082/where_group")
 						form := url.Values{}
 						form.Add("jwt", request_jwt(chatids[update.Message.Chat.ID], "where_group"))
 						form.Add("group", group)
+						form.Add("subgroup", subgroup)
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 						response, _ := client.Do(request)
