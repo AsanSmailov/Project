@@ -46,6 +46,7 @@ func handlerSecret(w http.ResponseWriter, r *http.Request) { //Функция п
 func getSchedule(w http.ResponseWriter, r *http.Request) {
 	var action string
 	var sub_group string
+	var group string
 	jwt_string := r.FormValue("jwt")
 	token, err := jwt.Parse(jwt_string, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
@@ -59,12 +60,14 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
 		} else {
 			action = payload["action"].(string)
 			sub_group = payload["sub_group"].(string)
+			group = payload["group"].(string)
+			group = group[3:6]
 		}
 	} else {
 		log.Fatal(err)
 	}
 	sub_group_str, _ := strconv.Atoi(sub_group)
-	fmt.Fprintf(w, "%s", act(action, sub_group_str))
+	fmt.Fprintf(w, "%s", act(action, group, sub_group_str))
 }
 
 func com_to_lesson(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +75,8 @@ func com_to_lesson(w http.ResponseWriter, r *http.Request) {
 	jwt_string := r.FormValue("jwt")
 	num_of_lesson := r.FormValue("num_of_lesson")
 	comment := r.FormValue("comment")
-	com_group, _ := strconv.Atoi(r.FormValue("group"))
+	com_subgroup, _ := strconv.Atoi(r.FormValue("subgroup"))
+	com_group:= r.FormValue("group")
 	token, err := jwt.Parse(jwt_string, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
@@ -92,11 +96,11 @@ func com_to_lesson(w http.ResponseWriter, r *http.Request) {
 		W := week_find()
 		LesNum := "lesson" + (num_of_lesson)
 		today := conv_day(time.Now().Weekday().String())
-		filter := bson.D{{"day", today}, {"subgroup", com_group}, {"week", W}}
+		filter := bson.D{{"day", today}, {"subgroup", com_subgroup}, {"week", W}}
 		clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
 		client, err := mongo.Connect(context.TODO(), clientOptions)
 		var result Day
-		collection := client.Database("schedule").Collection("PI-232")
+		collection := client.Database("schedule").Collection("PI-"+com_group)
 		err = collection.FindOne(context.TODO(), filter).Decode(&result)
 		upd := bson.D{{"$set", bson.D{{LesNum + ".comment", comment}}}}
 		_, err = collection.UpdateOne(context.TODO(), filter, upd)
@@ -111,7 +115,8 @@ func com_to_lesson(w http.ResponseWriter, r *http.Request) {
 
 func where_group(w http.ResponseWriter, r *http.Request) {
 	var action string
-	sub_group, _ := strconv.Atoi(r.FormValue("group"))
+	sub_group, _ := strconv.Atoi(r.FormValue("subgroup"))
+	group := r.FormValue("group")
 	jwt_string := r.FormValue("jwt")
 	token, err := jwt.Parse(jwt_string, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
@@ -128,12 +133,13 @@ func where_group(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Fatal(err)
 	}
-	fmt.Fprintf(w, "%s", act(action, sub_group))
+	fmt.Fprintf(w, "%s", act(action, group, sub_group))
 }
 
 func where_teacher(w http.ResponseWriter, r *http.Request) {
 	var sub_group string
 	var action string
+	var group string
 	jwt_string := r.FormValue("jwt")
 	teacher := r.FormValue("teacher")
 	token, err := jwt.Parse(jwt_string, func(token *jwt.Token) (interface{}, error) {
@@ -148,6 +154,7 @@ func where_teacher(w http.ResponseWriter, r *http.Request) {
 		} else {
 			action = payload["action"].(string)
 			sub_group = payload["sub_group"].(string)
+			group = payload["group"].(string)
 		}
 	} else {
 		log.Fatal(err)
@@ -159,7 +166,7 @@ func where_teacher(w http.ResponseWriter, r *http.Request) {
 		t := time.Now().String()
 		t_h, _ := strconv.Atoi(t[11:13])
 		t_m, _ := strconv.Atoi(t[14:16])
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		if (t_h == 8 || (t_h == 9 && t_m < 50)) && (teacher == result.Lesson1.Teacher) {
 			fmt.Fprintf(w, "%s", result.Lesson1.Classroom)
 		} else if ((t_h == 9 && t_m >= 50) || (t_h == 10) || (t_h == 11 && t_m < 30)) && (teacher == result.Lesson2.Teacher) {
@@ -222,7 +229,7 @@ func week_find() string {
 	return w
 }
 
-func find_day(today string, sub int, W string) Day {
+func find_day(today string, group string, sub int, W string) Day {
 	filter := bson.D{{"day", today}, {"subgroup", sub}, {"week", W}}
 	var result Day
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/") //Подключение к БД
@@ -234,7 +241,7 @@ func find_day(today string, sub int, W string) Day {
 	if err != nil {
 		log.Fatal(err)
 	}
-	collection := client.Database("schedule").Collection("PI-232")
+	collection := client.Database("schedule").Collection("PI-"+group)
 	err = collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
@@ -271,7 +278,7 @@ func resconv(result Day) string {
 	}
 	return result_str
 }
-func act(action string, sub int) string {
+func act(action string, group string, sub int) string {
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/") //Подключение к БД
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -285,14 +292,14 @@ func act(action string, sub int) string {
 	switch action {
 	case "today_lessons":
 		today := conv_day(time.Now().Weekday().String())
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		return resconv(result)
 	case "next_lesson":
 		today := conv_day(time.Now().Weekday().String())
 		t := time.Now().String()
 		t_h, _ := strconv.Atoi(t[11:13])
 		t_m, _ := strconv.Atoi(t[14:16])
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		if t_h < 8 {
 			return result.Lesson1.Classroom
 		} else if t_h == 8 || (t_h == 9 && t_m < 50) {
@@ -306,34 +313,34 @@ func act(action string, sub int) string {
 		}
 	case "tomorrow_lessons":
 		today := conv_next_day(time.Now().Weekday().String())
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		return resconv(result)
 	case "monday_lessons":
 		today := "Понедельник"
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		return resconv(result)
 	case "tuesday_lessons":
 		today := "Вторник"
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		return resconv(result)
 	case "wednesday_lessons":
 		today := "Среда"
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		return resconv(result)
 	case "thursday_lessons":
 		today := "Четверг"
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		return resconv(result)
 	case "friday_lessons":
 		today := "Пятница"
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		return resconv(result)
 	case "where_group":
 		today := conv_day(time.Now().Weekday().String())
 		t := time.Now().String()
 		t_h, _ := strconv.Atoi(t[11:13])
 		t_m, _ := strconv.Atoi(t[14:16])
-		result := find_day(today, sub, W)
+		result := find_day(today, group, sub, W)
 		if (t_h == 8 || (t_h == 9 && t_m < 50)) && result.Lesson1.Classroom != "" {
 			return result.Lesson1.Classroom
 		} else if ((t_h == 9 && t_m >= 50) || (t_h == 10) || (t_h == 11 && t_m < 30)) && result.Lesson2.Classroom != "" {
