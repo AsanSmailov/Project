@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"net/http"
 	"time"
@@ -61,7 +62,9 @@ func getSchedule(w http.ResponseWriter, r *http.Request) {
 			action = payload["action"].(string)
 			sub_group = payload["sub_group"].(string)
 			group = payload["group"].(string)
-			group = group[3:6]
+			log.Print(group)
+			group = group[strings.Index(group, "-")+1 : len(group)]
+			log.Print(group)
 		}
 	} else {
 		log.Fatal(err)
@@ -76,7 +79,8 @@ func com_to_lesson(w http.ResponseWriter, r *http.Request) {
 	num_of_lesson := r.FormValue("num_of_lesson")
 	comment := r.FormValue("comment")
 	com_subgroup, _ := strconv.Atoi(r.FormValue("subgroup"))
-	com_group:= r.FormValue("group")
+	com_group := r.FormValue("group")
+	com_group = com_group[strings.Index(com_group, "-")+1 : len(com_group)]
 	token, err := jwt.Parse(jwt_string, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
@@ -100,7 +104,7 @@ func com_to_lesson(w http.ResponseWriter, r *http.Request) {
 		clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
 		client, err := mongo.Connect(context.TODO(), clientOptions)
 		var result Day
-		collection := client.Database("schedule").Collection("PI-"+com_group)
+		collection := client.Database("schedule").Collection("PI-" + com_group)
 		err = collection.FindOne(context.TODO(), filter).Decode(&result)
 		upd := bson.D{{"$set", bson.D{{LesNum + ".comment", comment}}}}
 		_, err = collection.UpdateOne(context.TODO(), filter, upd)
@@ -117,6 +121,7 @@ func where_group(w http.ResponseWriter, r *http.Request) {
 	var action string
 	sub_group, _ := strconv.Atoi(r.FormValue("subgroup"))
 	group := r.FormValue("group")
+	group = group[strings.Index(group, "-")+1 : len(group)]
 	jwt_string := r.FormValue("jwt")
 	token, err := jwt.Parse(jwt_string, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
@@ -140,6 +145,7 @@ func where_teacher(w http.ResponseWriter, r *http.Request) {
 	var sub_group string
 	var action string
 	var group string
+
 	jwt_string := r.FormValue("jwt")
 	teacher := r.FormValue("teacher")
 	token, err := jwt.Parse(jwt_string, func(token *jwt.Token) (interface{}, error) {
@@ -155,6 +161,7 @@ func where_teacher(w http.ResponseWriter, r *http.Request) {
 			action = payload["action"].(string)
 			sub_group = payload["sub_group"].(string)
 			group = payload["group"].(string)
+			group = group[strings.Index(group, "-")+1 : len(group)]
 		}
 	} else {
 		log.Fatal(err)
@@ -241,7 +248,7 @@ func find_day(today string, group string, sub int, W string) Day {
 	if err != nil {
 		log.Fatal(err)
 	}
-	collection := client.Database("schedule").Collection("PI-"+group)
+	collection := client.Database("schedule").Collection("PI-" + group)
 	err = collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
