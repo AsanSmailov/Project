@@ -194,6 +194,7 @@ func schedule_update(w http.ResponseWriter, r *http.Request) {
 	group := r.FormValue("group")
 	Json := r.FormValue("json")
 	var J_Day []Day
+	filter := bson.D{}
 	err := json.Unmarshal([]byte(Json), J_Day)
 	if err != nil {
 		return
@@ -201,11 +202,13 @@ func schedule_update(w http.ResponseWriter, r *http.Request) {
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
 	client, err := mongo.Connect(context.TODO(), clientOptions) 
 	collection := client.Database("schedule").Collection("PI-" + group) 
+	DeleteResult, err := collection.DeleteMany(context.TODO(), filter)
 	for i := range J_Day {
 		insertResult, err := collection.InsertOne(context.TODO(), J_Day[i])
 		if err != nil {
 			log.Fatal(err)
 			log.Print(insertResult)
+			log.Print(DeleteResult)
 		}
 	}
 }
