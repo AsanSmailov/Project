@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
-
-	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -18,10 +18,10 @@ import (
 )
 
 type Day struct { //Структура для добавления дня недели в БД
-	Day              string `bson:"day"`
-	Week             string `bson:"week"`
-	Count_of_lessons int    `bson:"count_of_lessons"`
-	Subgroup         int    `bson:"subgroup"`
+	Day              string `bson:"day" json:"subgroup`
+	Week             string `bson:"week" json:"subgroup`
+	Count_of_lessons int    `bson:"count_of_lessons" json:"subgroup`
+	Subgroup         int    `bson:"subgroup json:"subgroup`
 	Lesson1          Lessons
 	Lesson2          Lessons
 	Lesson3          Lessons
@@ -29,11 +29,11 @@ type Day struct { //Структура для добавления дня нед
 	Lesson5          Lessons
 }
 type Lessons struct { //Структура для добавления предмета для дня недели в БД
-	Name      string `bson:"name"`
-	Time      string `bson:"time"`
-	Type      string `bson:"type"`
-	Classroom string `bson:"classroom"`
-	Teacher   string `bson:"teacher"`
+	Name      string `bson:"name" json:"name"`
+	Time      string `bson:"time" json:"time"`
+	Type      string `bson:"type" json:"type"`
+	Classroom string `bson:"classroom" json:"classroom"`
+	Teacher   string `bson:"teacher" json:"teacher"`
 	Comment   string `bson:"comment"`
 }
 
@@ -186,6 +186,26 @@ func where_teacher(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "%s", result.Lesson5.Classroom)
 		} else {
 			fmt.Fprintf(w, "%s", "У преподавателя нет пары!")
+		}
+	}
+}
+
+func schedule_update(w http.ResponseWriter, r *http.Request) {
+	group := r.FormValue("group")
+	Json := r.FormValue("json")
+	var J_Day []Day
+	err := json.Unmarshal([]byte(Json), J_Day)
+	if err != nil {
+		return
+	  }
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
+	client, err := mongo.Connect(context.TODO(), clientOptions) 
+	collection := client.Database("schedule").Collection("PI-" + group) 
+	for i := range J_Day {
+		insertResult, err := collection.InsertOne(context.TODO(), J_Day[i])
+		if err != nil {
+			log.Fatal(err)
+			log.Print(insertResult)
 		}
 	}
 }
@@ -371,14 +391,6 @@ func main() {
 	router.HandleFunc("/com_to_lesson", com_to_lesson)
 	router.HandleFunc("/where_group", where_group)
 	router.HandleFunc("/where_teacher", where_teacher)
+	router.HandleFunc("/upload_schedule", schedule_update)
 	http.ListenAndServe(":8082", router)
-	/* action := "next_lesson"
-	sub := 1
-	act(action, sub) */
-
-	/*day := Day{"Среда", "четная", 3, 1, Lessons{"Математика", "8:00", "лекция", "211А", "Смирнова С. И.", ""}, Lessons{"История", "9:50", "практика", "411В", "Дорофеев Д. В.", ""}, Lessons{"Математика", "11:30", "практика", "211А", "Смирнова С. И.", ""}, Lessons{}, Lessons{}}
-
-	insertResult, err := collection.InsertOne(context.TODO(), day)
-	if err != nil {
-		log.Fatal(err)*/
 }
