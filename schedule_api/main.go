@@ -18,15 +18,15 @@ import (
 )
 
 type Day struct { //Структура для добавления дня недели в БД
-	Day              string `bson:"day" json:"subgroup`
-	Week             string `bson:"week" json:"subgroup`
-	Count_of_lessons int    `bson:"count_of_lessons" json:"subgroup`
-	Subgroup         int    `bson:"subgroup json:"subgroup`
-	Lesson1          Lessons
-	Lesson2          Lessons
-	Lesson3          Lessons
-	Lesson4          Lessons
-	Lesson5          Lessons
+	Day              string  `bson:"day" json:"day"`
+	Week             string  `bson:"week" json:"week"`
+	Count_of_lessons int     `bson:"count_of_lessons" json:"count_of_lessons"`
+	Subgroup         int     `bson:"subgroup" json:"subgroup"`
+	Lesson1          Lessons `bson:"lesson1" json:"lesson1"`
+	Lesson2          Lessons `bson:"lesson2" json:"lesson2"`
+	Lesson3          Lessons `bson:"lesson3" json:"lesson3"`
+	Lesson4          Lessons `bson:"lesson4" json:"lesson4"`
+	Lesson5          Lessons `bson:"lesson5" json:"lesson5"`
 }
 type Lessons struct { //Структура для добавления предмета для дня недели в БД
 	Name      string `bson:"name" json:"name"`
@@ -193,22 +193,25 @@ func where_teacher(w http.ResponseWriter, r *http.Request) {
 func schedule_update(w http.ResponseWriter, r *http.Request) {
 	group := r.FormValue("group")
 	Json := r.FormValue("json")
+
 	var J_Day []Day
+
 	filter := bson.D{}
-	err := json.Unmarshal([]byte(Json), J_Day)
+	err := json.Unmarshal([]byte(Json), &J_Day)
+
 	if err != nil {
-		return
-	  }
+		log.Fatal(err)
+	}
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
-	client, err := mongo.Connect(context.TODO(), clientOptions) 
-	collection := client.Database("schedule").Collection("PI-" + group) 
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	collection := client.Database("schedule").Collection("PI-" + group)
 	DeleteResult, err := collection.DeleteMany(context.TODO(), filter)
 	for i := range J_Day {
 		insertResult, err := collection.InsertOne(context.TODO(), J_Day[i])
 		if err != nil {
-			log.Fatal(err)
-			log.Print(insertResult)
-			log.Print(DeleteResult)
+			fmt.Fprintf(w, "%s", err)
+			fmt.Fprintf(w, "%s", insertResult)
+			fmt.Fprintf(w, "%s", DeleteResult)
 		}
 	}
 }
@@ -250,7 +253,7 @@ func week_find() string {
 	t = time.Now().String()
 	m := t[5:7]
 	d := t[8:10]
-	if ((d == "20" || d == "21" || d == "22" || d == "23" || d == "24") && m == "11") || ((d == "04" || d == "05" || d == "06" || d == "07" || d == "08" || d == "18" || d == "19" || d == "20" || d == "21" || d == "22") && m == "12") {
+	if ((d == "20" || d == "21" || d == "22" || d == "23" || d == "24" || d == "25" || d == "26") && m == "11") || ((d == "04" || d == "05" || d == "06" || d == "07" || d == "08" || d == "18" || d == "19" || d == "20" || d == "21" || d == "22") && m == "12") {
 		w = "нечетная"
 	}
 	if ((d == "27" || d == "28" || d == "29" || d == "30") && m == "11") || ((d == "01" || d == "11" || d == "12" || d == "13" || d == "14" || d == "15" || d == "25" || d == "26" || d == "27" || d == "28" || d == "29") && m == "12") {
@@ -394,6 +397,6 @@ func main() {
 	router.HandleFunc("/com_to_lesson", com_to_lesson)
 	router.HandleFunc("/where_group", where_group)
 	router.HandleFunc("/where_teacher", where_teacher)
-	router.HandleFunc("/upload_schedule", schedule_update)
+	router.HandleFunc("/upload_schedule", schedule_update).Methods("POST")
 	http.ListenAndServe(":8082", router)
 }
