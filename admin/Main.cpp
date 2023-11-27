@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include "User.h" //моя библиотека пользователя
 #include <jwt-cpp/jwt.h> //подключил библиотеку на jwt токен
 #include <httplib.h> //подключил библиотеку на http в C++
@@ -21,7 +21,7 @@ int main() {
     administration.Post("/updateuser", Updateuser);
 
     //прием пост запроса на jwt
-    administration.Post("/toadmin", priemjwt);
+    administration.Post("/toadmin", toadmin);
 
     //приём пост запроса на ключ
     administration.Post("/getSecret", priemsecret);
