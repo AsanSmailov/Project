@@ -34,7 +34,7 @@ struct User {
 map <int, string>open_session;
 
 map <string, string> session;
-
+//token : jwt, jwtsecret
 map <string, map<string, string>> sessiondata;
 string secret;
 
@@ -97,7 +97,7 @@ string generateRandomString(int length) {
 //функция-обработчик пост запроса на jwt
 void toadmin(const Request& req, Response& res) {
     string jwt = req.has_param("jwt") ? req.get_param_value("jwt") : "0";
-    string usertoken = req.has_param("jwt") ? req.get_param_value("usertoken") : "0";
+    string usertoken = req.has_param("usertoken") ? req.get_param_value("usertoken") : "0";
     cout << "jwt token: " << jwt << "\n";
     User user = DecodeJWT(jwt, secret);
     cout << user.github_id;
