@@ -201,7 +201,7 @@ func main() {
 						requestURL := fmt.Sprintf("http://localhost:8083//toadmin")
 						form := url.Values{}
 						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
-						form.Add("gitig", chatids[update.Message.Chat.ID])
+						form.Add("gitid", chatids[update.Message.Chat.ID])
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 						response, _ := client.Do(request)
@@ -227,7 +227,7 @@ func main() {
 						requestURL := fmt.Sprintf("http://localhost:8083//toadmin(token)")
 						form := url.Values{}
 						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
-						form.Add("gitig", chatids[update.Message.Chat.ID])
+						form.Add("gitid", chatids[update.Message.Chat.ID])
 						form.Add("token", token)
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -279,7 +279,7 @@ func main() {
 					delete(chatids, update.Message.Chat.ID)
 					msg.Text = "Вы успешно вышли!"
 				case "Оставить комментарий к паре":
-					if get_role(update.Message.Chat.ID) == "teacher" { //проверка роли для добавления коментария к паре
+					if get_role(update.Message.Chat.ID) == "teacher" || get_role(update.Message.Chat.ID) == "admin" { //проверка роли для добавления коментария к паре
 						var num_of_lesson, group, comment string
 						msg.Text = "Введите номер пары"
 						bot.Send(msg)
@@ -339,7 +339,7 @@ func main() {
 						msg.Text = "Недостаточно прав"
 					}
 				case "Где группа":
-					if get_role(update.Message.Chat.ID) == "teacher" { //проверка роли
+					if get_role(update.Message.Chat.ID) == "teacher" || get_role(update.Message.Chat.ID) == "admin" { //проверка роли
 						group := ""
 						msg.Text = "Введите номер группы (Например ПИ-232)"
 						bot.Send(msg)
