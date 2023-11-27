@@ -89,7 +89,7 @@ func request_jwt_admin(GIT_ID string) string {
 	requestURL := "http://localhost:8080/getJWT/admin"
 
 	form := url.Values{}
-	form.Add("github_id", GIT_ID)
+	form.Add("gitid", GIT_ID)
 
 	request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -198,10 +198,9 @@ func main() {
 				case "toadmin":
 					if get_role(update.Message.Chat.ID) == "admin" { //Проверка роли для перехода в админ панель
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8083//toadmin")
+						requestURL := fmt.Sprintf("http://localhost:8083/toadmin")
 						form := url.Values{}
 						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
-						form.Add("gitid", chatids[update.Message.Chat.ID])
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 						response, _ := client.Do(request)
@@ -224,11 +223,10 @@ func main() {
 							break
 						}
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8083//toadmin(token)")
+						requestURL := fmt.Sprintf("http://localhost:8083/toadmin")
 						form := url.Values{}
 						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
-						form.Add("gitid", chatids[update.Message.Chat.ID])
-						form.Add("token", token)
+						form.Add("usertoken", token)
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 						response, _ := client.Do(request)
@@ -430,7 +428,8 @@ func main() {
 						}
 					}
 				case "Назад":
-					msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
+					newKeyboard1 := tgbotapi.NewMessage(update.Message.Chat.ID, "Выберите действие:")
+					newKeyboard1.ReplyMarkup = tgbotapi.NewReplyKeyboard(
 						tgbotapi.NewKeyboardButtonRow(
 							tgbotapi.NewKeyboardButton("Где следующая пара"),
 							tgbotapi.NewKeyboardButton("Расписание на сегодня"),
@@ -447,6 +446,7 @@ func main() {
 							tgbotapi.NewKeyboardButton("Выйти"),
 						),
 					)
+					bot.Send(newKeyboard1)
 				default:
 					msg.Text = "Я не понимаю, что вы хотите сказать."
 				}
