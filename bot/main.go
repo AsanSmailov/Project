@@ -169,6 +169,7 @@ func main() {
 				tgbotapi.NewKeyboardButton("Оставить комментарий к паре"),
 				tgbotapi.NewKeyboardButton("Где группа"),
 				tgbotapi.NewKeyboardButton("toadmin"),
+				tgbotapi.NewKeyboardButton("toadmin(token)"),
 				tgbotapi.NewKeyboardButton("Выйти"),
 			),
 		)
@@ -201,6 +202,33 @@ func main() {
 						form := url.Values{}
 						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
 						form.Add("gitig", chatids[update.Message.Chat.ID])
+						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
+						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+						response, _ := client.Do(request)
+						resBody, _ := io.ReadAll(response.Body)
+						msg.Text = string(resBody)
+						defer response.Body.Close()
+					} else {
+						msg.Text = "Недостаточно прав"
+					}
+				case "toadmin(token)":
+					if get_role(update.Message.Chat.ID) == "admin" { //Проверка роли для перехода в админ панель
+						token := ""
+						msg.Text = "Введите токен"
+						bot.Send(msg)
+						for update := range updates {
+							if update.Message == nil { // ignore any non-Message Updates
+								continue
+							}
+							token = update.Message.Text
+							break
+						}
+						client := http.Client{}
+						requestURL := fmt.Sprintf("http://localhost:8083//toadmin(token)")
+						form := url.Values{}
+						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
+						form.Add("gitig", chatids[update.Message.Chat.ID])
+						form.Add("token", token)
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
 						request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 						response, _ := client.Do(request)
@@ -415,6 +443,7 @@ func main() {
 							tgbotapi.NewKeyboardButton("Оставить комментарий к паре"),
 							tgbotapi.NewKeyboardButton("Где группа"),
 							tgbotapi.NewKeyboardButton("toadmin"),
+							tgbotapi.NewKeyboardButton("toadmin(token)"),
 							tgbotapi.NewKeyboardButton("Выйти"),
 						),
 					)
