@@ -1,7 +1,7 @@
-#include <httplib.h> //библиотека для http
-#include <xlnt/xlnt.hpp> //билблиотека для парсинга
-#include <jwt-cpp/jwt.h> //подключил библиотеку на jwt токен
-#include <nlohmann/json.hpp> //библиотека json
+#include <httplib.h> //Р±РёР±Р»РёРѕС‚РµРєР° РґР»СЏ http
+#include <xlnt/xlnt.hpp> //Р±РёР»Р±Р»РёРѕС‚РµРєР° РґР»СЏ РїР°СЂСЃРёРЅРіР°
+#include <jwt-cpp/jwt.h> //РїРѕРґРєР»СЋС‡РёР» Р±РёР±Р»РёРѕС‚РµРєСѓ РЅР° jwt С‚РѕРєРµРЅ
+#include <nlohmann/json.hpp> //Р±РёР±Р»РёРѕС‚РµРєР° json
 #include <cookie.h>
 #include <string>
 #include <sstream>
@@ -16,13 +16,13 @@ using namespace httplib;
 using namespace std;
 using json = nlohmann::json;
 
-//Объект(имя и группа пользователя)
+//РћР±СЉРµРєС‚(РёРјСЏ Рё РіСЂСѓРїРїР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ)
 struct object {
 	string full_name;
 	string group;
 };
 
-//структура пользователя
+//СЃС‚СЂСѓРєС‚СѓСЂР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 struct User {
 	int github_id;
 	int tg_id;
@@ -34,39 +34,39 @@ struct User {
 map <int, string>open_session;
 
 map <string, string> session;
-//token : jwt, jwtsecret
+
 map <string, map<string, string>> sessiondata;
 string secret;
 
-//функция для расшифровки jwt токена
+//С„СѓРЅРєС†РёСЏ РґР»СЏ СЂР°СЃС€РёС„СЂРѕРІРєРё jwt С‚РѕРєРµРЅР°
 User DecodeJWT(const string token, const string secret) {
     User user;
     user.github_id = 0;
-    // Создаем объект verifier(проверка), используя алгоритм HS256
+    // РЎРѕР·РґР°РµРј РѕР±СЉРµРєС‚ verifier(РїСЂРѕРІРµСЂРєР°), РёСЃРїРѕР»СЊР·СѓСЏ Р°Р»РіРѕСЂРёС‚Рј HS256
     auto verifier = jwt::verify()
         .allow_algorithm(jwt::algorithm::hs256{ secret });
 
-    // Разбор и проверка JWT-токена. Мы передаем token и verifier в функцию decode.
+    // Р Р°Р·Р±РѕСЂ Рё РїСЂРѕРІРµСЂРєР° JWT-С‚РѕРєРµРЅР°. РњС‹ РїРµСЂРµРґР°РµРј token Рё verifier РІ С„СѓРЅРєС†РёСЋ decode.
     auto decoded_token = jwt::decode(token);
     verifier.verify(decoded_token);
-    //парсинг времени, проверка жизни токена
+    //РїР°СЂСЃРёРЅРі РІСЂРµРјРµРЅРё, РїСЂРѕРІРµСЂРєР° Р¶РёР·РЅРё С‚РѕРєРµРЅР°
     string time;
-    //парсинг времени системного
+    //РїР°СЂСЃРёРЅРі РІСЂРµРјРµРЅРё СЃРёСЃС‚РµРјРЅРѕРіРѕ
     auto now = chrono::system_clock::now();
     time_t curtime = std::chrono::system_clock::to_time_t(now);
 
 
-    //парсинг времени авторизации
+    //РїР°СЂСЃРёРЅРі РІСЂРµРјРµРЅРё Р°РІС‚РѕСЂРёР·Р°С†РёРё
     auto timeExp = decoded_token.get_payload_claim("expires_at").as_int();
     cout << "timeEXP: " << timeExp << "\n";
     cout << "curtime: " << curtime << "\n";
-    //определение жизни токена
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ Р¶РёР·РЅРё С‚РѕРєРµРЅР°
     if (timeExp < curtime) {
         cout << "error";
         return user;
     }
     else {
-        // Извлечение полей из JWT-токена
+        // РР·РІР»РµС‡РµРЅРёРµ РїРѕР»РµР№ РёР· JWT-С‚РѕРєРµРЅР°
         user.github_id = decoded_token.get_payload_claim("githubID").as_int();
         user.tg_id = decoded_token.get_payload_claim("tgID").as_int();
         user.user.full_name = decoded_token.get_payload_claim("full_name").as_string();
@@ -77,13 +77,13 @@ User DecodeJWT(const string token, const string secret) {
 
 }
 
-//функция-обработки пост запроса на ключ
+//С„СѓРЅРєС†РёСЏ-РѕР±СЂР°Р±РѕС‚РєРё РїРѕСЃС‚ Р·Р°РїСЂРѕСЃР° РЅР° РєР»СЋС‡
 void priemsecret(const Request& req, Response& res) {
     secret = req.has_param("SECRET") ? req.get_param_value("SECRET") : 0;
     cout << "jwt secret: " << secret << "\n";
 }
 
-// Функция для создания случайной строки
+// Р¤СѓРЅРєС†РёСЏ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СЃР»СѓС‡Р°Р№РЅРѕР№ СЃС‚СЂРѕРєРё
 string generateRandomString(int length) {
     const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     string randomString;
@@ -94,9 +94,10 @@ string generateRandomString(int length) {
     return randomString;
 }
 
-//функция-обработчик пост запроса на jwt
-void priemjwt(const Request& req, Response& res) {
+//С„СѓРЅРєС†РёСЏ-РѕР±СЂР°Р±РѕС‚С‡РёРє РїРѕСЃС‚ Р·Р°РїСЂРѕСЃР° РЅР° jwt
+void toadmin(const Request& req, Response& res) {
     string jwt = req.has_param("jwt") ? req.get_param_value("jwt") : "0";
+    string usertoken = req.has_param("jwt") ? req.get_param_value("usertoken") : "0";
     cout << "jwt token: " << jwt << "\n";
     User user = DecodeJWT(jwt, secret);
     cout << user.github_id;
@@ -106,15 +107,21 @@ void priemjwt(const Request& req, Response& res) {
         return;
     }
     cout << user.github_id;
-    if (open_session.count(user.github_id) == 0) {
-        //создание токена сессии
+    if (open_session.count(user.github_id) == 0 && usertoken == "0") {
+        //СЃРѕР·РґР°РЅРёРµ С‚РѕРєРµРЅР° СЃРµСЃСЃРёРё
         string tokenstr = generateRandomString(16);
         open_session[user.github_id] = tokenstr;
         session[tokenstr] = jwt;
         sessiondata[jwt]["token"] = tokenstr;
         sessiondata[jwt]["jwt_secret"] = secret;
     }
-    //создаём свой URL
+    else if (open_session.count(user.github_id) == 0 && usertoken != "0") {
+        open_session[user.github_id] = usertoken;
+        session[usertoken] = jwt;
+        sessiondata[jwt]["token"] = usertoken;
+        sessiondata[jwt]["jwt_secret"] = secret;
+    }
+    //СЃРѕР·РґР°С‘Рј СЃРІРѕР№ URL
     string URL = "http://localhost:8083/admin-panel?token=" + open_session[user.github_id];
     cout << URL << "\n";
     res.set_content(URL, "text/plain");
@@ -122,7 +129,7 @@ void priemjwt(const Request& req, Response& res) {
 void updatesession(string token) {
     auto decoded_token = jwt::decode(session[token]);
     auto payload = decoded_token.get_payload_claims();
-    // Готовим данные
+    // Р“РѕС‚РѕРІРёРј РґР°РЅРЅС‹Рµ
     string secret = generateRandomString(16);
     auto ExpiresAt = std::chrono::system_clock::now() + std::chrono::minutes(60);
     auto github_id = decoded_token.get_payload_claim("githubID").as_int();
@@ -132,7 +139,7 @@ void updatesession(string token) {
     auto role = decoded_token.get_payload_claim("role").as_string();
 
     auto newjwt = jwt::create()
-        // Тип токена
+        // РўРёРї С‚РѕРєРµРЅР°
         .set_type("JWT")
 
         .set_payload_claim("githubID", picojson::value(int64_t{ github_id }))
@@ -141,10 +148,10 @@ void updatesession(string token) {
         .set_payload_claim("role", jwt::claim(role))
         .set_payload_claim("group", jwt::claim(group))
         .set_payload_claim("expires_at", jwt::claim(ExpiresAt))
-        // Подписываем токен ключом SECRET
+        // РџРѕРґРїРёСЃС‹РІР°РµРј С‚РѕРєРµРЅ РєР»СЋС‡РѕРј SECRET
         .sign(jwt::algorithm::hs256{ secret });
 
-    //Обновляем сессию
+    //РћР±РЅРѕРІР»СЏРµРј СЃРµСЃСЃРёСЋ
 
     sessiondata.erase(session[token]);
     session[token] = newjwt;
@@ -213,104 +220,117 @@ void adminpanel(const Request& req, Response& res) {
     auto token = req.has_param("token") ? req.get_param_value("token") : "0";
     if (session.count(token)) {
         updatesession(token);
-    }
-
-    string usersjson;
-    httplib::Client cli("http://localhost:8080");
-    std::string requestURL = "/getAllUsers";
-    httplib::Headers headers = {
-        { "Content-Type", "application/json" }
-    };
-    httplib::Params params;
-    if (auto response = cli.Post(requestURL, headers, params)) {
-        if (response->status == 200) {
-            // Получаем тело ответа
-            usersjson = (response->body);
+        string usersjson;
+        httplib::Client cli("http://localhost:8080");
+        std::string requestURL = "/getAllUsers";
+        httplib::Headers headers = {
+            { "Content-Type", "application/json" }
+        };
+        httplib::Params params;
+        if (auto response = cli.Post(requestURL, headers, params)) {
+            if (response->status == 200) {
+                // РџРѕР»СѓС‡Р°РµРј С‚РµР»Рѕ РѕС‚РІРµС‚Р°
+                usersjson = (response->body);
+            }
+            else {
+                std::cout << "Status error: " << response->status << std::endl;
+            }
         }
         else {
-            std::cout << "Status error: " << response->status << std::endl;
+            auto err = response.error();
+            std::cout << "HTTP error: " << httplib::to_string(err) << std::endl;
         }
+
+        json users = json::parse(usersjson);
+        string html_response;
+        html_response += u8"<html>";
+        html_response += u8"<header><meta charset='utf-8'></header>";
+        html_response += u8"<body><h2>Р—Р°РіСЂСѓР·РєР° РЅРѕРІРѕРіРѕ СЂР°СЃРїРёСЃР°РЅРёСЏ</h2>";
+        html_response += u8"<iframe name='dummyframe' id='dummyframe' style='display: none;'></iframe>";
+        html_response += u8"<form action = 'http://localhost:8083/upload' method = 'post' enctype = 'multipart/form-data' target='dummyframe'>";
+        html_response += u8"<label for = 'file'>Р’С‹Р±РµСЂРёС‚Рµ С„Р°Р№Р» : </label>";
+        html_response += u8"<input type = 'file' id = 'file' name = 'file' accept = '.xlsx'>";
+        html_response += u8"<br><br>";
+        html_response += u8"<input type = 'submit'></form>";
+
+        html_response += u8"<h2>РџРѕР»СЊР·РѕРІР°С‚РµР»Рё</h2>";
+        html_response += u8"<table><tr><td>РРјСЏ</td><td>Р“СЂСѓРїРїР°</td><td>Р РѕР»СЊ</td></tr>";
+
+
+        for (const auto& user : users) {
+            string name = user["about"]["full_name"];
+            string group = user["about"]["group"];
+            html_response += u8"<tr>";
+
+            html_response += u8"<td><form action='http://localhost:8083/updateuser' method='post'>";
+            html_response += u8"<input type='text' , name='data' value='";
+            html_response += name;
+            html_response += u8"'/>";
+            html_response += u8"<input type='hidden' , name='chatid' value='" + to_string(user["tg_id"]);
+            html_response += u8"'/>";
+            html_response += u8"<input type='hidden' , name='datatype' value='full_name'/>";
+            html_response += u8"<p><button type = 'submit'>РР·РјРµРЅРёС‚СЊ</button></p>";
+            html_response += u8"</form></td>";
+
+            html_response += u8"<td><form action='http://localhost:8083/updateuser' method='post'>";
+            html_response += u8"<input type='text' , name='data' value='";
+            html_response += group;
+            html_response += u8"'/>";
+            html_response += u8"<input type='hidden' , name='chatid' value='" + to_string(user["tg_id"]);
+            html_response += u8"'/>";
+            html_response += u8"<input type='hidden' , name='datatype' value='group'/>";
+            html_response += u8"<p><button type = 'submit'>РР·РјРµРЅРёС‚СЊ</button></p>";
+            html_response += u8"</form></td>";
+
+            html_response += u8"<td><form action='http://localhost:8083/updateuser' method='post'>";
+            html_response += u8"<select id='data' name = 'data'>";
+            html_response += u8"<option value='student'>РЎС‚СѓРґРµРЅС‚</option>";
+            html_response += u8"<option value='teacher'>РџСЂРµРїРѕРґР°РІР°С‚РµР»СЊ</option>";
+            html_response += u8"<option value='admin'>РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ</option>";
+            html_response += u8"</select>";
+            html_response += u8"<input type='hidden' , name='chatid' value='" + to_string(user["tg_id"]);
+            html_response += u8"'/>";
+            html_response += u8"<input type='hidden' , name='datatype' value='role'/>";
+            html_response += u8"<p><button type = 'submit'>РР·РјРµРЅРёС‚СЊ</button></p>";
+            html_response += u8"</form></td>";
+
+            html_response += u8"<td><form action='http://localhost:8083/deleteuser' method='post'>";
+            html_response += u8"<p><button type='submit' name = 'gitid' value = '" + to_string(user["github_id"]) + u8"'>РЈРґР°Р»РёС‚СЊ</button></p>";
+            html_response += u8"</form></td>";
+
+            html_response += u8"</tr>";
+
+        }
+        html_response += u8"</table></body></html>";
+
+
+
+        Cookie cookie;
+        cookie.name = "Cookie";
+        cookie.value = session[token];
+        cookie.path = "/";
+        cookie.maxAge = 3600;
+        cookie.httpOnly = true;
+        cookie.secure = true;
+        cookie.sameSite = Cookie::SameSiteLaxMode;
+        Cookie::set_cookie(res, cookie);
+
+        res.set_content(html_response, "text/html");
     }
     else {
-        auto err = response.error();
-        std::cout << "HTTP error: " << httplib::to_string(err) << std::endl;
+        auto newtoken = generateRandomString(4);
+        session[newtoken] = "";
+        string html_response;
+        html_response += u8"<html>";
+        html_response += u8"<header><meta charset='utf-8'></header>";
+        html_response += u8"<body><h3>РўРµРєСѓС‰Р°СЏ СЃРµСЃСЃРёСЏ РЅРµ РЅР°Р№РґРµРЅР°.</h3>";
+        html_response += u8"<p>Р”Р»СЏ РїСЂРѕРґРѕР»Р¶РµРЅРёСЏ СЂР°Р±РѕС‚С‹ Р°РІС‚РѕСЂРёР·СѓР№С‚РµСЃСЊ С‡РµСЂРµР· telegram:</p>";
+        html_response += u8"<h3>https://t.me/SimpleExampeBot</h3>";
+        html_response += u8"<p>Р—Р°С‚РµРј РЅР°Р¶РјРёС‚Рµ 'toadmin(token)' Рё РІРІРµРґРёС‚Рµ СЃР»РµРґСѓСЋС‰РёР№ РєРѕРґ:</p>";
+        html_response += u8"<h3>" + newtoken + u8"</h3>";
+        html_response += u8"</body></html>";
+        res.set_content(html_response, "text/html");
     }
-
-    json users = json::parse(usersjson);
-    string html_response;
-    html_response += "<html>";
-    
-    html_response += "<body><h2>Загрузка нового расписания</h2>";
-    html_response += "<iframe name='dummyframe' id='dummyframe' style='display: none;'></iframe>";
-    html_response += "<form action = 'http://localhost:8083/upload' method = 'post' enctype = 'multipart/form-data' target='dummyframe'>";
-    html_response += "<label for = 'file'>Выберите файл : </label>";
-    html_response += "<input type = 'file' id = 'file' name = 'file' accept = '.xlsx'>";
-    html_response += "<br><br>";
-    html_response += "<input type = 'submit'></form>";
-
-    html_response += "<h2>Пользователи</h2>";
-    html_response += "<table><tr><td>Имя</td><td>Группа</td><td>Роль</td></tr>";
-        
-
-    for (const auto& user : users) {
-        string name = user["about"]["full_name"];
-        string group = user["about"]["group"];
-        html_response += "<tr>";
-
-        html_response += "<td><form action='http://localhost:8083/updateuser' method='post'>";
-        html_response += "<input type='text' , name='data' value='";
-        html_response += name;
-        html_response += "'/>";
-        html_response += "<input type='hidden' , name='chatid' value='" + to_string(user["tg_id"]);
-        html_response += "'/>";
-        html_response += "<input type='hidden' , name='datatype' value='full_name'/>";
-        html_response += "<p><button type = 'submit'>Изменить</button></p>";
-        html_response += "</form></td>";
-
-        html_response += "<td><form action='http://localhost:8083/updateuser' method='post'>";
-        html_response += "<input type='text' , name='data' value='";
-        html_response += group;
-        html_response += "'/>";
-        html_response += "<input type='hidden' , name='chatid' value='" + to_string(user["tg_id"]);
-        html_response += "'/>";
-        html_response += "<input type='hidden' , name='datatype' value='group'/>";
-        html_response += "<p><button type = 'submit'>Изменить</button></p>";
-        html_response += "</form></td>";
-
-        html_response += "<td><form action='http://localhost:8083/updateuser' method='post'>";
-        html_response += "<select id='data' name = 'data'>";
-        html_response += "<option value='student'>Студент</option>";
-        html_response += "<option value='teacher'>Преподаватель</option>";
-        html_response += "<option value='admin'>Администратор</option>";
-        html_response += "</select>";
-        html_response += "<input type='hidden' , name='chatid' value='" + to_string(user["tg_id"]);
-        html_response += "'/>";
-        html_response += "<input type='hidden' , name='datatype' value='role'/>";
-        html_response += "<p><button type = 'submit'>Изменить</button></p>";
-        html_response += "</form></td>";
-
-        html_response += "<td><form action='http://localhost:8083/deleteuser' method='post'>";
-        html_response += "<p><button type='submit' name = 'gitid' value = '" + to_string(user["github_id"]) + "'>Удалить</button></p>";
-        html_response += "</form></td>";
-
-        html_response += "</tr>";
-
-    }
-    html_response += "</table></body></html>";
-
-
-
-    Cookie cookie;
-    cookie.name = "Cookie";
-    cookie.value = session[token];
-    cookie.path = "/";
-    cookie.maxAge = 3600;
-    cookie.httpOnly = true;
-    cookie.secure = true;
-    cookie.sameSite = Cookie::SameSiteLaxMode;
-    Cookie::set_cookie(res, cookie);
-
-    res.set_content(html_response, "text/html");
 }
 
 string convert_time(double n) {
@@ -339,14 +359,14 @@ void excel_parser(size_t i, const httplib::MultipartFormData& file) {
     wb.load(stream);
     
     auto ws = wb.sheet_by_index(i);
-    auto rows_count = ws.calculate_dimension().height();  // Количество строк
-    auto cols_count = ws.calculate_dimension().width(); // Количество столбцов
+    auto rows_count = ws.calculate_dimension().height();  // РљРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє
+    auto cols_count = ws.calculate_dimension().width(); // РљРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚РѕР»Р±С†РѕРІ
     
     json rasp;
     stack<string>week;
     stack<string>day;
-    for (size_t row = 1; row <= ws.calculate_dimension().height(); row++) {      // Цикл по строкам
-        for (size_t col = 1; col <= 1; col++) {   // Цикл по столбцам
+    for (size_t row = 1; row <= ws.calculate_dimension().height(); row++) {      // Р¦РёРєР» РїРѕ СЃС‚СЂРѕРєР°Рј
+        for (size_t col = 1; col <= 1; col++) {   // Р¦РёРєР» РїРѕ СЃС‚РѕР»Р±С†Р°Рј
             auto cur_cell = ws.cell(col, row).to_string();
             if (cur_cell == "Week:") {
                 if (!week.empty()) {
@@ -472,7 +492,7 @@ void excel_parser(size_t i, const httplib::MultipartFormData& file) {
     auto response = cli.Post(requestURL, headers, params);
     cout << "test6";
 }
-//Функция приёма файла расписания и последующего его парсинга
+//Р¤СѓРЅРєС†РёСЏ РїСЂРёС‘РјР° С„Р°Р№Р»Р° СЂР°СЃРїРёСЃР°РЅРёСЏ Рё РїРѕСЃР»РµРґСѓСЋС‰РµРіРѕ РµРіРѕ РїР°СЂСЃРёРЅРіР°
 void obrabotchik(const Request& req, Response& res) {
     auto cookie = Cookie::get_cookie(req, "Cookie");
     auto jwt = cookie.value;
@@ -483,7 +503,7 @@ void obrabotchik(const Request& req, Response& res) {
     }
     string token = sessiondata[jwt]["token"];
     updatesession(token);
-    // Получение данных файла
+    // РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… С„Р°Р№Р»Р°
     auto size = req.files.size();
     auto ret = req.has_file("file");
     if (ret) {
@@ -507,6 +527,6 @@ void obrabotchik(const Request& req, Response& res) {
     new_cookie.secure = true;
     new_cookie.sameSite = Cookie::SameSiteLaxMode;
     Cookie::set_cookie(res, new_cookie);
-    res.set_content("Все норм", "text/plain");
+    res.set_content("Р’СЃРµ РЅРѕСЂРј", "text/plain");
 }
 
