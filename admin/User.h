@@ -34,7 +34,7 @@ struct User {
 map <int, string>open_session;
 
 map <string, string> session;
-//token : jwt, jwtsecret
+
 map <string, map<string, string>> sessiondata;
 string secret;
 
