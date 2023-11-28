@@ -334,13 +334,41 @@ func act(action string, group string, sub int) string {
 		t_m, _ := strconv.Atoi(t[14:16])
 		result := find_day(today, group, sub, W)
 		if t_h < 8 {
-			return result.Lesson1.Classroom
+			if result.Lesson1.Classroom != "" {
+				return "1 пара " + result.Lesson1.Classroom
+			} else if result.Lesson2.Classroom != "" {
+				return "2 пара " + result.Lesson2.Classroom
+			} else if result.Lesson3.Classroom != "" {
+				return "3 пара " + result.Lesson3.Classroom
+			} else if result.Lesson4.Classroom != "" {
+				return "4 пара " + result.Lesson4.Classroom
+			} else if result.Lesson5.Classroom != "" {
+				return "5 пара " + result.Lesson5.Classroom
+			}
 		} else if t_h == 8 || (t_h == 9 && t_m < 50) {
-			return result.Lesson2.Classroom
+			if result.Lesson2.Classroom != "" {
+				return "2 пара " + result.Lesson2.Classroom
+			} else if result.Lesson3.Classroom != "" {
+				return "3 пара " + result.Lesson3.Classroom
+			} else if result.Lesson4.Classroom != "" {
+				return "4 пара " + result.Lesson4.Classroom
+			} else if result.Lesson5.Classroom != "" {
+				return "5 пара " + result.Lesson5.Classroom
+			}
 		} else if (t_h == 9 && t_m >= 50) || (t_h == 10) || (t_h == 11 && t_m < 30) {
-			return result.Lesson3.Classroom
+			if result.Lesson3.Classroom != "" {
+				return "3 пара " + result.Lesson3.Classroom
+			} else if result.Lesson4.Classroom != "" {
+				return "4 пара " + result.Lesson4.Classroom
+			} else if result.Lesson5.Classroom != "" {
+				return "5 пара " + result.Lesson5.Classroom
+			}
 		} else if (t_h == 11 && t_m >= 30) || (t_h == 12) || (t_h == 13 && t_m < 20) {
-			return result.Lesson4.Classroom
+			if result.Lesson4.Classroom != "" {
+				return "4 пара " + result.Lesson4.Classroom
+			} else if result.Lesson5.Classroom != "" {
+				return "5 пара " + result.Lesson5.Classroom
+			}
 		} else if (t_h == 13 && t_m >= 20) || (t_h == 14 && t_m < 50) {
 			return result.Lesson5.Classroom
 		}
