@@ -198,7 +198,7 @@ func main() {
 				case "toadmin":
 					if get_role(update.Message.Chat.ID) == "admin" { //Проверка роли для перехода в админ панель
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8083/toadmin")
+						requestURL := fmt.Sprintf("http://10.99.8.148:8083/toadmin")
 						form := url.Values{}
 						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
 						request, _ := http.NewRequest("POST", requestURL, strings.NewReader(form.Encode()))
@@ -223,7 +223,7 @@ func main() {
 							break
 						}
 						client := http.Client{}
-						requestURL := fmt.Sprintf("http://localhost:8083/toadmin")
+						requestURL := fmt.Sprintf("http://10.99.8.148:8083/toadmin")
 						form := url.Values{}
 						form.Add("jwt", request_jwt_admin(chatids[update.Message.Chat.ID]))
 						form.Add("usertoken", token)
