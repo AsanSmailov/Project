@@ -134,13 +134,13 @@ func JWTschedule(rw http.ResponseWriter, req *http.Request) {
 	sub_group = line[strings.Index(line, "(")+1 : strings.Index(line, ")")]
 	log.Print(group, " ", sub_group)
 	//Формируем токен
-	tokenExpiresAt := time.Now().Add(time.Second * time.Duration(60))
+	tokenExpiresAt := time.Now().Add(time.Minute * time.Duration(60))
 	payload := jwt.MapClaims{
 		"action":     action,
 		"full_name":  user.About.FullName,
 		"group":      group,
 		"sub_group":  sub_group,
-		"expires_at": tokenExpiresAt,
+		"expires_at": tokenExpiresAt.Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	//Подписываем токен секретным кодом
@@ -155,13 +155,12 @@ func JWTschedule(rw http.ResponseWriter, req *http.Request) {
 func JWTadmin(rw http.ResponseWriter, req *http.Request) {
 	//Получаем данные
 	github_id, _ := strconv.ParseInt(req.FormValue("gitid"), 10, 64)
-	action := string(req.FormValue("action"))
 	//Генерируем секрет
 	SECRET := randJWTSecret(16)
 
 	//Отправляем секретный код модулю администрирования
 	client := http.Client{}
-	requesturl := "http://localhost:8083/getSecret"
+	requesturl := "http://10.99.8.148:8083/getSecret"
 
 	form := url.Values{}
 	form.Add("SECRET", SECRET)
@@ -176,12 +175,12 @@ func JWTadmin(rw http.ResponseWriter, req *http.Request) {
 	tokenExpiresAt := time.Now().Add(time.Second * time.Duration(60))
 
 	payload := jwt.MapClaims{
-		"action":     action,
 		"githubID":   user.GithubID,
 		"tgID":       user.TgId,
 		"full_name":  user.About.FullName,
+		"role":       user.Role,
 		"group":      user.About.Group,
-		"expires_at": tokenExpiresAt,
+		"expires_at": tokenExpiresAt.Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	//Подписываем токен секретным кодом
