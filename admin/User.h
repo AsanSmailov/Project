@@ -16,7 +16,7 @@ using namespace httplib;
 using namespace std;
 using json = nlohmann::json;
 
-//Объект(имя и группа пользователя)
+//Объект(имя и группа пользователя
 struct object {
 	string full_name;
 	string group;
@@ -122,7 +122,7 @@ void toadmin(const Request& req, Response& res) {
         sessiondata[jwt]["jwt_secret"] = secret;
     }
     //создаём свой URL
-    string URL = "http://localhost:8083/admin-panel?token=" + open_session[user.github_id];
+    string URL = "http://10.99.8.148:8083/admin-panel?token=" + open_session[user.github_id];
     cout << URL << "\n";
     res.set_content(URL, "text/plain");
 }
@@ -188,7 +188,7 @@ void Updateuser(const Request& req, Response& res) {
     auto response = cli.Post(requestURL, headers, params);
 
 
-    res.set_redirect("http://localhost:8083/admin-panel?token=" + token);
+    res.set_redirect("http://10.99.8.148:8083/admin-panel?token=" + token);
 }
 
 void deleteuser(const Request& req, Response& res) {
@@ -213,9 +213,24 @@ void deleteuser(const Request& req, Response& res) {
 
     auto response = cli.Post(requestURL, headers, params);
 
-    res.set_redirect("http://localhost:8083/admin-panel?token=" + token);
+    res.set_redirect("http://10.99.8.148:8083/admin-panel?token=" + token);
 }
+void Exit(const Request& req, Response& res) {
+    auto token = req.has_param("token") ? req.get_param_value("token") : "0";
 
+    sessiondata.erase(session[token]);
+    session.erase(token);
+    cout << "test1";
+    for (auto& [gitid, sessiontoken] : open_session) {
+        if (sessiontoken == token) {
+            cout << gitid;
+            open_session.erase(gitid);
+            break;
+        }
+    }
+    cout << "test3";
+    res.set_redirect("http://10.99.8.148:8083/admin-panel");
+}
 void adminpanel(const Request& req, Response& res) {
     auto token = req.has_param("token") ? req.get_param_value("token") : "0";
     if (session.count(token)) {
@@ -238,7 +253,7 @@ void adminpanel(const Request& req, Response& res) {
         }
         else {
             auto err = response.error();
-            std::cout << "HTTP error: " << httplib::to_string(err) << std::endl;
+            std::cout << "HTTP1 error: " << httplib::to_string(err) << std::endl;
         }
 
         json users = json::parse(usersjson);
@@ -247,7 +262,7 @@ void adminpanel(const Request& req, Response& res) {
         html_response += u8"<header><meta charset='utf-8'></header>";
         html_response += u8"<body><h2>Загрузка нового расписания</h2>";
         html_response += u8"<iframe name='dummyframe' id='dummyframe' style='display: none;'></iframe>";
-        html_response += u8"<form action = 'http://localhost:8083/upload' method = 'post' enctype = 'multipart/form-data' target='dummyframe'>";
+        html_response += u8"<form action = 'http://10.99.8.148:8083/upload' method = 'post' enctype = 'multipart/form-data' target='dummyframe'>";
         html_response += u8"<label for = 'file'>Выберите файл : </label>";
         html_response += u8"<input type = 'file' id = 'file' name = 'file' accept = '.xlsx'>";
         html_response += u8"<br><br>";
@@ -262,7 +277,7 @@ void adminpanel(const Request& req, Response& res) {
             string group = user["about"]["group"];
             html_response += u8"<tr>";
 
-            html_response += u8"<td><form action='http://localhost:8083/updateuser' method='post'>";
+            html_response += u8"<td><form action='http://10.99.8.148:8083/updateuser' method='post'>";
             html_response += u8"<input type='text' , name='data' value='";
             html_response += name;
             html_response += u8"'/>";
@@ -272,7 +287,7 @@ void adminpanel(const Request& req, Response& res) {
             html_response += u8"<p><button type = 'submit'>Изменить</button></p>";
             html_response += u8"</form></td>";
 
-            html_response += u8"<td><form action='http://localhost:8083/updateuser' method='post'>";
+            html_response += u8"<td><form action='http://10.99.8.148:8083/updateuser' method='post'>";
             html_response += u8"<input type='text' , name='data' value='";
             html_response += group;
             html_response += u8"'/>";
@@ -282,7 +297,7 @@ void adminpanel(const Request& req, Response& res) {
             html_response += u8"<p><button type = 'submit'>Изменить</button></p>";
             html_response += u8"</form></td>";
 
-            html_response += u8"<td><form action='http://localhost:8083/updateuser' method='post'>";
+            html_response += u8"<td><form action='http://10.99.8.148:8083/updateuser' method='post'>";
             html_response += u8"<select id='data' name = 'data'>";
             html_response += u8"<option value='student'>Студент</option>";
             html_response += u8"<option value='teacher'>Преподаватель</option>";
@@ -294,14 +309,18 @@ void adminpanel(const Request& req, Response& res) {
             html_response += u8"<p><button type = 'submit'>Изменить</button></p>";
             html_response += u8"</form></td>";
 
-            html_response += u8"<td><form action='http://localhost:8083/deleteuser' method='post'>";
+            html_response += u8"<td><form action='http://10.99.8.148:8083/deleteuser' method='post'>";
             html_response += u8"<p><button type='submit' name = 'gitid' value = '" + to_string(user["github_id"]) + u8"'>Удалить</button></p>";
             html_response += u8"</form></td>";
 
             html_response += u8"</tr>";
 
         }
-        html_response += u8"</table></body></html>";
+        html_response += u8"</table>";
+        html_response += u8"<form action='http://10.99.8.148:8083/exit' method='post'>";
+        html_response += u8"<input type='hidden' , name='token' value='" + token + u8"'/>";
+        html_response += u8"<p><button type = 'submit'>Выйти</button></p>";
+        html_response += u8"</form></body></html>";
 
 
 
