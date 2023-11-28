@@ -20,6 +20,8 @@ int main() {
 
     administration.Post("/updateuser", Updateuser);
 
+    administration.Post("/exit", Exit);
+
     //прием пост запроса на jwt
     administration.Post("/toadmin", toadmin);
 
@@ -32,6 +34,6 @@ int main() {
     administration.Post("/upload", obrabotchik);
     
     //айпи локальный сервера
-    administration.listen("localhost", 8083);
+    administration.listen("10.99.8.148", 8083);
     return 1;
 }
